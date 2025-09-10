@@ -1,43 +1,33 @@
-import Image from 'next/image';
+// "use client" と useState の import は不要になったので削除
+
+import ProfileHeader from '@/components/ProfileHeader';
+import ProjectCard from '@/components/ProjectCard';
+import { siteConfig } from '@/config';
 
 export default function Home() {
-  return (
-    // 以前の <main> タグは一度削除し、セクションごとに組み立てます
-    <>
-      {/* ===== Hero Section ===== */}
-      <section className="relative h-screen flex items-center justify-center text-center text-white">
-        {/* 背景画像 */}
-        <Image
-          src="/images/hero-background.jpg"
-          alt="Background"
-          fill // "layout"の代わりにこれを使う
-          quality={80}
-          className="-z-10 object-cover" // "objectFit"の代わりにTailwindのクラスを使う
-          />
-        {/* 背景のオーバーレイ */}
-        <div className="absolute inset-0 bg-black/60 -z-10" />
+  // useStateとfilteredProjectsのロジックは不要になったので削除
+  const projects = siteConfig.projects;
 
-        <div className="z-10 animate-fade-in-up">
-          <div className="mb-4">
-            <Image
-              src="/images/profile-icon.jpg" // プロフィール画像
-              alt="南保俊輔"
-              width={150}
-              height={150}
-              className="rounded-full mx-auto border-4 border-white shadow-lg"
-            />
-          </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
-            Shunsuke Nambo
-          </h1>
-          <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            大学2年生 / Web Developer / ハッカソン好き<br />
-            新しい技術とアイデアで、世界を少しだけ面白くしたい。
-          </p>
+  return (
+    <div>
+      <ProfileHeader />
+
+      {/* プロジェクト一覧にidを追加 */}
+      <section id="projects" className="container mx-auto p-4 md:p-8">
+        <h2 className="text-3xl font-bold text-center mb-12">Projects</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {projects.map((project, index) => (
+            <ProjectCard key={index} project={project} />
+          ))}
         </div>
       </section>
-
-      {/* この下に他のセクションを追加していく */}
-    </>
+      
+      {/* お問い合わせセクションの例 */}
+      <section id="contact" className="container mx-auto p-4 md:p-8 text-center">
+         <h2 className="text-3xl font-bold text-center mb-12">Contact</h2>
+         <p>ご連絡は下記メールアドレスまでお願いします。</p>
+         <a href={`mailto:${siteConfig.author.email}`} className="text-cyan-400 hover:underline mt-4 inline-block">{siteConfig.author.email}</a>
+      </section>
+    </div>
   );
 }

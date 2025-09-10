@@ -1,28 +1,23 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-// 作成したコンポーネントを読み込む
-import Header from "@/components/Header";
+import GlobalHeader from "@/components/GlobalHeader"; // 新しいヘッダーをインポート
 import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My Portfolio", // ブラウザのタブに表示されるタイトル
+  title: "My Portfolio",
   description: "これは私のポートフォリオサイトです。",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja">
-      <body className={`${inter.className} bg-gray-800 text-white`}>
-        <Header /> {/* ここにヘッダーを配置 */}
-        <main>{children}</main> {/* この中に各ページの中身が表示される */}
-        <Footer /> {/* ここにフッターを配置 */}
+    <html lang="ja" className="scroll-smooth">
+      <body className={`${inter.className} bg-gray-900 text-white`}>
+        <GlobalHeader /> {/* ここにヘッダーを配置 */}
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );
