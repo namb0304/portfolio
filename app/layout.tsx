@@ -15,9 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" className="scroll-smooth">
       <body className={`${inter.className} bg-gray-900 text-white`}>
-        <GlobalHeader /> {/* ここにヘッダーを配置 */}
-        <main>{children}</main>
-        <Footer />
+        <div className={`${inter.className} bg-gray-900 text-white`}>
+          <GlobalHeader /> 
+          <main>{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

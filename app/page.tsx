@@ -1,28 +1,30 @@
-// "use client" と useState の import は不要になったので削除
-
 import ProfileHeader from '@/components/ProfileHeader';
-import ProjectCard from '@/components/ProjectCard';
+import Skills from '@/components/Skills';
+import GitHubActivity from '@/components/GitHubActivity';
+import ProjectsCarousel from '@/components/ProjectsCarousel';
+import Timeline from '@/components/Timeline';
 import { siteConfig } from '@/config';
 
 export default function Home() {
-  // useStateとfilteredProjectsのロジックは不要になったので削除
   const projects = siteConfig.projects;
 
   return (
     <div>
+      {/* 1. プロフィール: あなたが何者か */}
       <ProfileHeader />
 
-      {/* プロジェクト一覧にidを追加 */}
-      <section id="projects" className="container mx-auto p-4 md:p-8">
-        <h2 className="text-3xl font-bold text-center mb-12">Projects</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} />
-          ))}
-        </div>
-      </section>
+      {/* 2. スキル: 何ができるのか */}
+      <Skills />
+
+      {/* 4. プロジェクト: 具体的な成果物 */}
+      <ProjectsCarousel />
       
-      {/* お問い合わせセクションの例 */}
+      
+      {/* 5. タイムライン: これまでの歩み */}
+      <Timeline />
+      <GitHubActivity />
+      
+      {/* 6. コンタクト: 連絡先 */}
       <section id="contact" className="container mx-auto p-4 md:p-8 text-center">
          <h2 className="text-3xl font-bold text-center mb-12">Contact</h2>
          <p>ご連絡は下記メールアドレスまでお願いします。</p>
