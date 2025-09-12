@@ -69,7 +69,7 @@ const Timeline: React.FC = () => {
       {/* === レイアウト表示エリア === */}
       {layout === 'horizontal' ? (
         <div className="w-full overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-cyan-500/50 scrollbar-track-gray-800">
-          <div className="relative flex items-end h-96 px-4">
+          <div className="relative flex items-end h-120 px-4">
             <div className="absolute bottom-10 left-0 w-full h-0.5 bg-gray-700"></div>
             {/* ★★★ .map()のネストを解消し、正しいロジックのみ残しました ★★★ */}
             {sortedAndFilteredItems.map((item, index) => {
