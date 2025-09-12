@@ -13,7 +13,6 @@ const ProfileHeader = () => {
   const today = new Date();
   const entranceYear = siteConfig.university.entranceYear;
   let currentGrade = today.getFullYear() - entranceYear;
-  // 4月になるまでは1学年下として計算 (日本の学年制度対応)
   if (today.getMonth() + 1 < 4) {
     currentGrade--;
   }
@@ -21,7 +20,8 @@ const ProfileHeader = () => {
   // --- ここまで ---
 
   return (
-    <section id="profile" className="pt-24 md:pt-28">
+    // ↓↓↓ この行に scroll-mt-16 を追加 ↓↓↓
+    <section id="profile" className="pt-24 md:pt-28 scroll-mt-16">
       <div className="h-48 md:h-64 bg-gray-700 relative">
         <Image
           src="/images/hero-background.jpg"
@@ -48,7 +48,7 @@ const ProfileHeader = () => {
                 </h1>
                 <p className="mt-2 text-md text-gray-400 flex items-center gap-2">
                   <FaUniversity />
-                  {affiliation} {/* 計算結果を表示 */}
+                  {affiliation}
                 </p>
               </div>
               <div className="md:col-span-2">

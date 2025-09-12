@@ -17,7 +17,8 @@
 }
 
 
-/* === Embla Carousel Coverflow Styles (修正版) === */
+
+/* === Embla Carousel 2D Coverflow Styles (最終修正版) === */
 .embla {
   position: relative;
   padding: 2rem 0;
@@ -27,37 +28,29 @@
 }
 .embla__container {
   display: flex;
-  transform-style: preserve-3d;
-  perspective: 800px;
 }
 .embla__slide {
   position: relative;
-  /* ↓↓↓ ここが修正点です ↓↓↓ */
-  flex: 0 0 50%; /* デフォルト（スマホ）では画面の半分くらいの幅 */
+  flex: 0 0 50%;
   padding: 0 1rem;
-  transition: transform 0.5s ease;
-  transform: rotateY(0) scale(0.8);
-  opacity: 0.5;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  
+  /* デフォルト：すべてのカードを少し小さく、半透明に */
+  transform: scale(0.85);
+  opacity: 0.6;
+  z-index: 1; /* 重なり順を低く */
 }
 
-/* PCサイズ (768px以上) の場合に適応されるスタイル */
 @media (min-width: 768px) {
   .embla__slide {
-    flex: 0 0 33.33%; /* PCでは画面の1/3くらいの幅 */
+    flex: 0 0 33.33%;
   }
 }
-/* ↑↑↑ ここまでが修正点です ↑↑↑ */
 
+/* 選択されている（真ん中の）スライドのスタイル */
 .embla__slide.is-selected {
-  transform: rotateY(0) scale(1);
+  /* 真ん中のカードだけを大きく、不透明に、そして一番手前に */
+  transform: scale(1);
   opacity: 1;
   z-index: 10;
-}
-.embla__slide.is-prev {
-  transform: rotateY(45deg) scale(0.8);
-  z-index: 9;
-}
-.embla__slide.is-next {
-  transform: rotateY(-45deg) scale(0.8);
-  z-index: 9;
 }

@@ -12,6 +12,9 @@ const GlobalHeader = () => {
             <a href="#profile" className="text-gray-300 hover:text-white transition-colors">
               Profile
             </a>
+            <a href="#skills" className="text-gray-300 hover:text-white transition-colors">
+              Skills
+            </a>
             <a href="#projects" className="text-gray-300 hover:text-white transition-colors">
               Projects
             </a>

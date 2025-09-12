@@ -1,40 +1,87 @@
-import { FaPython, FaReact, FaDocker, FaGitAlt, FaPhp } from 'react-icons/fa';
-import { SiJavascript, SiFlask, SiFastapi, SiFirebase, SiTailwindcss } from 'react-icons/si';
+import { 
+  FaPython, 
+  FaDocker, 
+  FaPhp, 
+  FaHtml5,      // 修正
+  FaCss3Alt, 
+  FaGithub,
+  FaDatabase    // 修正 (NoSQLの汎用アイコンとして)
+} from 'react-icons/fa';
+import { 
+  SiJavascript, 
+  SiFirebase, 
+  SiTypescript,
+  SiSupabase,
+  SiPostgresql, // 修正
+  SiSqlite,     // 修正
+  SiFlutter     // 修正
+} from 'react-icons/si';
+// ↑↑↑ ここまで ↑↑↑
 
-// TypeScriptでデータの型を定義しておくと、入力ミスを防げます
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  // プロフィール情報
+  // --- プロフィール情報 (変更なし) ---
   author: {
     name: "南保 俊輔",
-    // affiliationは削除し、下のuniversityオブジェクトで管理します
     catchphrase: "人が使いやすく、使いたくなるサービスを創り続ける",
     bio: "開発が好きでWeb技術全般に興味があります。週末はハッカソンに参加したり、個人開発に時間を使っています。",
     email: "your.email@example.com",
     github: "https://github.com/your-username",
   },
-
-  // ★★★ 学年計算のための大学情報 ★★★
-  // ここに入学年度を入れるだけで、プロフィール部分の学年が自動で計算されます
+  
+  // --- 大学情報 (変更なし) ---
   university: {
     name: "武蔵野大学 データサイエンス学部",
-    entranceYear: 2024, // あなたの入学年度（西暦）
+    entranceYear: 2024,
   },
 
-  // スキルセット
-  skills: [
-    { name: 'Python', icon: FaPython },
-    { name: 'JavaScript', icon: SiJavascript },
-    { name: 'PHP', icon: FaPhp },
-    { name: 'React', icon: FaReact },
-    { name: 'Flask', icon: SiFlask },
-    { name: 'FastAPI', icon: SiFastapi },
-    { name: 'Git', icon: FaGitAlt },
-    { name: 'Docker', icon: FaDocker },
-    { name: 'Firebase', icon: SiFirebase },
-    { name: 'Tailwind CSS', icon: SiTailwindcss },
-  ],
+  // ★★★ スキルセットのアイコンを修正しました ★★★
+  skills: {
+    frontend: [
+      {
+        name: 'HTML5',
+        icon: FaHtml5, // 修正: FaReact -> FaHtml5
+      },
+      {
+        name: 'CSS3',
+        icon: FaCss3Alt,
+        frameworks: ['Tailwind CSS']
+      },
+      {
+        name: 'JavaScript',
+        icon: SiJavascript,
+        frameworks: ['React', 'Vue.js', 'Next.js']
+      },
+      {
+        name: 'TypeScript',
+        icon: SiTypescript,
+      },
+    ],
+    backend: [
+      {
+        name: 'Python',
+        icon: FaPython,
+        frameworks: ['Flask', 'FastAPI']
+      },
+      {
+        name: 'PHP',
+        icon: FaPhp,
+      },
+    ],
+    database: [
+      { name: 'PostgreSQL', icon: SiPostgresql }, // 修正: SiFirebase -> SiPostgresql
+      { name: 'SQLite', icon: SiSqlite },       // 修正: SiFirebase -> SiSqlite
+      { name: 'NoSQL', icon: FaDatabase },      // 修正: SiSupabase -> FaDatabase (汎用アイコン)
+    ],
+    tools: [
+      { name: 'GitHub', icon: FaGithub },
+      { name: 'Firebase', icon: SiFirebase },
+      { name: 'Docker', icon: FaDocker },
+      { name: 'Flutter', icon: SiFlutter },      // 修正: FaGitAlt -> SiFlutter
+    ]
+  },
+
 
   // 作品リスト
   // config/index.ts
