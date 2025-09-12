@@ -30,7 +30,11 @@ const Timeline: React.FC = () => {
 
   return (
     <section id="timeline" className="container mx-auto p-4 md:p-8 scroll-mt-16">
-      <h2 className="text-3xl font-bold text-center mb-4">Activities</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
+            Activities 
+            </span>
+        </h2>
       <p className="text-center text-gray-400 mb-8">私の成長の軌跡</p>
       
       {/* === コントロールパネル === */}

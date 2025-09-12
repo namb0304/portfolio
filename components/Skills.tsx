@@ -12,7 +12,11 @@ const Skills = () => {
 
   return (
     <section id="skills" className="container mx-auto p-4 md:p-8 scroll-mt-16">
-        <h2 className="text-3xl font-bold text-center mb-4">Skills</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
+            Skills
+            </span>
+        </h2>
         <p className="text-center text-gray-400 mb-8">私が今まで触れてきた技術スタックです。</p>
 
       {/* PCでは最大4カラム、画面サイズに応じて自動で調整 */}
