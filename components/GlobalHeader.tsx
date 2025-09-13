@@ -18,7 +18,6 @@ const GlobalHeader = () => {
             <a href="#projects" className="text-gray-300 hover:text-white transition-colors">
               Projects
             </a>
-
             <a href="#timeline" className="text-gray-300 hover:text-white transition-colors">
               Activities
             </a>

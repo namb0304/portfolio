@@ -26,7 +26,7 @@ const Timeline: React.FC = () => {
   }, [activeTag, sortOrder, historyItems]);
 
   return (
-    <section id="timeline" className="container mx-auto p-4 md:p-8 scroll-mt-16">
+    <section id="timeline" className="container mx-auto p-4 md:p-8 scroll-mt-22">
       <h2 className="text-3xl font-bold text-center mb-4">
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
           Activities
@@ -57,11 +57,11 @@ const Timeline: React.FC = () => {
             </button>
           </div>
           <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full whitespace-nowrap">
-            <button onClick={() => setSortOrder('desc')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${sortOrder === 'desc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
-              <FaArrowDown /> 新しい順
-            </button>
             <button onClick={() => setSortOrder('asc')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${sortOrder === 'asc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
               <FaArrowUp /> 古い順
+            </button>
+            <button onClick={() => setSortOrder('desc')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${sortOrder === 'desc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
+              <FaArrowDown /> 新しい順
             </button>
           </div>
         </div>
@@ -70,7 +70,7 @@ const Timeline: React.FC = () => {
       {/* === レイアウト表示エリア === */}
       {layout === 'horizontal' ? (
         <div className="w-full overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-cyan-500/50 scrollbar-track-gray-800">
-          <div className="relative inline-flex items-end h-[30rem] px-4 py-12">
+          <div className="relative inline-flex items-end min-h-[24rem] px-4 pt-1 pb-16">
             <div className="absolute bottom-10 left-0 right-0 h-0.5 bg-gray-700 z-0"></div>
             {sortedAndFilteredItems.map((item, index) => {
               const slopeValue = sortOrder === 'asc'
@@ -79,7 +79,9 @@ const Timeline: React.FC = () => {
               
               return (
                 <div key={index} className="relative z-10" style={{ marginBottom: `${slopeValue}rem` }}>
-                  <div className="absolute top-full text-center w-full mt-10 text-sm text-gray-400">{item.date}</div>
+                    <div className="absolute top-full text-center w-full mt-5 text-base font-mono text-gray-400">
+                      {item.date}
+                    </div>
                   <HorizontalTimelineItem item={item} />
                 </div>
               );

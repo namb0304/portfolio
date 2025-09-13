@@ -21,8 +21,8 @@ const ProfileHeader = () => {
 
   return (
     // ↓↓↓ この行に scroll-mt-16 を追加 ↓↓↓
-    <section id="profile" className="pt-24 md:pt-28 scroll-mt-16">
-      <div className="h-48 md:h-64 bg-gray-700 relative">
+    <section id="profile" className="pt-24 md:pt-16 scroll-mt-16">
+      <div className="h-48 md:h-90 bg-gray-700 relative">
         <Image
           src="/images/hero-background.jpg"
           alt="Banner"
@@ -55,7 +55,7 @@ const ProfileHeader = () => {
               {affiliation}
             </p>
           </div>
-              <div className="md:col-span-2 md:-translate-y-18">
+              <div className="md:col-span-2 md:-translate-y-15">
                 {/* 1. キャッチコピーの修正 */}
                 <blockquote className="pl-4 border-l-4 border-cyan-400">
                   <p className="text-xl italic text-white leading-relaxed">
@@ -63,7 +63,7 @@ const ProfileHeader = () => {
                   </p>
                 </blockquote>
                 {/* 2. 自己紹介文の修正 */}
-                <p className="mt-6 max-w-3xl text-lg text-gray-200 leading-relaxed whitespace-pre-line">
+                <p className="mt-9 max-w-3xl text-lg text-gray-200 leading-relaxed whitespace-pre-line">
                     {siteConfig.author.bio}
                 </p>
               </div>
