@@ -14,7 +14,6 @@ const Timeline: React.FC = () => {
 
   const allTags = [...new Set(historyItems.flatMap(item => item.tags))];
 
-  // フィルターとソートのロジックをここに一本化
   const sortedAndFilteredItems = useMemo(() => {
     const filtered = activeTag
       ? historyItems.filter(item => item.tags.includes(activeTag))
@@ -26,15 +25,13 @@ const Timeline: React.FC = () => {
     });
   }, [activeTag, sortOrder, historyItems]);
 
-  // horizontalItems の useMemo は不要になったので削除
-
   return (
     <section id="timeline" className="container mx-auto p-4 md:p-8 scroll-mt-16">
-        <h2 className="text-3xl font-bold text-center mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
-            Activities 
-            </span>
-        </h2>
+      <h2 className="text-3xl font-bold text-center mb-4">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
+          Activities
+        </span>
+      </h2>
       <p className="text-center text-gray-400 mb-8">私の成長の軌跡</p>
       
       {/* === コントロールパネル === */}
@@ -51,12 +48,12 @@ const Timeline: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full">
-            <button onClick={() => setLayout('horizontal')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${layout === 'horizontal' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
-              <FaChartLine /> 
+            <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full">
+            <button onClick={() => setLayout('horizontal')} className={`p-2 rounded-full transition-colors ${layout === 'horizontal' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`} title="横表示">
+              <FaChartLine className="text-lg" />
             </button>
-            <button onClick={() => setLayout('vertical')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${layout === 'vertical' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
-              <FaListUl /> 
+            <button onClick={() => setLayout('vertical')} className={`p-2 rounded-full transition-colors ${layout === 'vertical' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`} title="縦表示">
+              <FaListUl className="text-lg" />
             </button>
           </div>
           <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full whitespace-nowrap">
@@ -73,16 +70,15 @@ const Timeline: React.FC = () => {
       {/* === レイアウト表示エリア === */}
       {layout === 'horizontal' ? (
         <div className="w-full overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-cyan-500/50 scrollbar-track-gray-800">
-          <div className="relative flex items-end h-120 px-4">
-            <div className="absolute bottom-10 left-0 w-full h-0.5 bg-gray-700"></div>
-            {/* ★★★ .map()のネストを解消し、正しいロジックのみ残しました ★★★ */}
+          <div className="relative inline-flex items-end h-[30rem] px-4 py-12">
+            <div className="absolute bottom-10 left-0 right-0 h-0.5 bg-gray-700 z-0"></div>
             {sortedAndFilteredItems.map((item, index) => {
               const slopeValue = sortOrder === 'asc'
                 ? index * 2
                 : (sortedAndFilteredItems.length - 1 - index) * 2;
               
               return (
-                <div key={index} className="relative" style={{ marginBottom: `${slopeValue}rem` }}>
+                <div key={index} className="relative z-10" style={{ marginBottom: `${slopeValue}rem` }}>
                   <div className="absolute top-full text-center w-full mt-10 text-sm text-gray-400">{item.date}</div>
                   <HorizontalTimelineItem item={item} />
                 </div>

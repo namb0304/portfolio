@@ -44,21 +44,27 @@ const ProfileHeader = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
               <div className="md:col-span-1">
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-                  {siteConfig.author.name}
-                </h1>
-                <p className="mt-2 text-md text-gray-400 flex items-center gap-2">
-                  <FaUniversity />
-                  {affiliation}
-                </p>
-              </div>
-              <div className="md:col-span-2">
+              {siteConfig.author.name}
+            </h1>
+            {/* 英語名を追加 */}
+            <p className="mt-2 text-xl font-dancing-script text-gray-300">
+                {siteConfig.author.nameEn}
+            </p>
+            <p className="mt-4 text-md text-gray-400 flex items-center gap-2">
+              <FaUniversity />
+              {affiliation}
+            </p>
+          </div>
+              <div className="md:col-span-2 md:-translate-y-18">
+                {/* 1. キャッチコピーの修正 */}
                 <blockquote className="pl-4 border-l-4 border-cyan-400">
-                  <p className="text-lg italic text-gray-200">
+                  <p className="text-xl italic text-white leading-relaxed">
                     "{siteConfig.author.catchphrase}"
                   </p>
                 </blockquote>
-                <p className="mt-4 text-gray-300 leading-relaxed">
-                  {siteConfig.author.bio}
+                {/* 2. 自己紹介文の修正 */}
+                <p className="mt-6 max-w-3xl text-lg text-gray-200 leading-relaxed whitespace-pre-line">
+                    {siteConfig.author.bio}
                 </p>
               </div>
             </div>

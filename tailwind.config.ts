@@ -7,7 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // ヒーローセクションで使うアニメーションの設定
+      // 既存のアニメーション設定
       keyframes: {
         "fade-in-up": {
           "0%": {
@@ -22,6 +22,10 @@ module.exports = {
       },
       animation: {
         "fade-in-up": "fade-in-up 1s ease-out forwards",
+      },
+      // ↓↓↓ ここに新しいフォントを追加しました ↓↓↓
+      fontFamily: {
+        'dancing-script': ['var(--font-dancing-script)'],
       },
     },
   },

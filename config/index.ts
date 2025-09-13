@@ -12,9 +12,9 @@ import {
   SiFirebase, 
   SiTypescript,
   SiSupabase,
-  SiPostgresql, // 修正
-  SiSqlite,     // 修正
-  SiFlutter     // 修正
+  SiPostgresql, 
+  SiSqlite,  
+  SiFlutter     
 } from 'react-icons/si';
 // ↑↑↑ ここまで ↑↑↑
 
@@ -24,10 +24,11 @@ export const siteConfig = {
   // --- プロフィール情報 (変更なし) ---
   author: {
     name: "南保 俊輔",
+    nameEn: "Nambo Shunsuke", 
     catchphrase: "人が使いやすく、使いたくなるサービスを創り続ける",
-    bio: "開発が好きでWeb技術全般に興味があります。週末はハッカソンに参加したり、個人開発に時間を使っています。",
-    email: "your.email@example.com",
-    github: "https://github.com/your-username",
+    bio: "・開発が好きでWeb技術全般に関心があり、休日はハッカソンに参加したり個人開発に時間を使っています。\n・フロントエンドやUI/UXに強い関心があり「人が使いやすく、使いたくなるサービス」を目指して開発しています。新しい技術を学んで実践することが好きでバックエンドやデータベースにも取り組んでいます。\n・将来的にはチームをリードできるフルスタックエンジニアを目指しています。",
+    email: "shunsukenamb0304@gmail.com",
+    github: "https://github.com/namb0304",
   },
   
   // --- 大学情報 (変更なし) ---
