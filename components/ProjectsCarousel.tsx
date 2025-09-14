@@ -63,8 +63,19 @@ const ProjectsCarousel = () => {
                             ))}
                           </div>
                           <div className="flex items-center space-x-4">
-                            {project.github && <a href={project.github} target="_blank" rel="noopener noreferrer"><FaGithub className="text-gray-400 hover:text-white" /></a>}
-                            {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer"><FaLink className="text-gray-400 hover:text-white" /></a>}
+                            {project.github !== "なし" ? (
+                          <a href={project.github} target="_blank" rel="noopener noreferrer"><FaGithub className="text-gray-400 hover:text-white" /></a>
+                        ) : (
+                          <span className="text-gray-600" title="リポジトリ非公開"><FaGithub /></span>
+                        )}
+
+                        {project.url !== "なし" ? (
+                          <a href={project.url} target="_blank" rel="noopener noreferrer"><FaLink className="text-gray-400 hover:text-white" /></a>
+                        ) : (
+                          <span className="text-xs italic text-gray-500" title="現在デプロイされていません">
+                            デプロイ準備中...
+                          </span>
+                        )}
                           </div>
                         </div>
                       </div>

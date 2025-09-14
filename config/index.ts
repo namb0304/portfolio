@@ -125,7 +125,7 @@ export const siteConfig = {
       category: "hackathon",
       tags: ["Google Apps Script", "LINE bot"],
       image: "/projects/project-hikoboshi.png",
-      url: "なし",
+      url: "https://script.google.com/macros/s/AKfycbzj4qgiIhltVS79ln_qPxhknENe1KD3Qa7Va4XBj-HInQssBK40rMfbedFWtmEdNvw/exec",
       github: "なし",
     },
     {
@@ -144,7 +144,7 @@ export const siteConfig = {
         tags: ["expo","react native","firebase","Android Studio"],
         image: "/projects/project-future.png",
         url: "なし",
-        github: "なし",
+        github: "https://github.com/namb0304/TrainLiveInfo.git",
     },
     {
         title: "chrome拡張機能によるタブ管理ツール",
