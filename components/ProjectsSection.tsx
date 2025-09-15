@@ -26,7 +26,7 @@ const ProjectsSection = () => {
           </button>
         </div>
       </div>
-      <p className="text-center text-gray-400 mb-8">私の今までのプロジェクト</p>
+      <p className="text-center text-gray-400 mb-8">私の今までの個人開発やハッカソンでの制作物です</p>
       {/* === レイアウトに応じて表示を切り替え === */}
       {layout === 'carousel' ? <ProjectsCarousel /> : <ProjectsGrid />}
     </section>

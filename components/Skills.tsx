@@ -24,7 +24,7 @@ const Skills = () => {
             Skills
             </span>
         </h2>
-        <p className="text-center text-gray-400 mb-12">私が今まで触れてきた技術スタックです。</p>
+        <p className="text-center text-gray-400 mb-12">私が今まで触れてきた技術スタックです</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {Object.entries(skills).map(([categoryKey, skillList]) => (

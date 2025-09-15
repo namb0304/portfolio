@@ -32,7 +32,7 @@ const ProjectsCarousel = () => {
   return (
     <section id="projects" className="container mx-auto p-4 md:p-1 scroll-mt-16">
       <div className="container mx-auto">
-        <p className="text-center text-gray-400 mb-5">カードをドラッグまたはスクロールしてみてください。</p>
+        <p className="text-center text-gray-400 mb-5">カードをドラッグまたはスクロールしてみてください</p>
         
         <div className="embla">
           <div className="embla__viewport" ref={emblaRef}>
