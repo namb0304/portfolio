@@ -12,7 +12,7 @@ const HorizontalTimelineItem = ({ item }: TimelineItemProps) => {
         <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-8 bg-gray-700"></div>
         <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-cyan-500 rounded-full border-4 border-gray-900"></div>
         
-        <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+        <h3 className="text-lg font-bold text-white mb-2 whitespace-pre-line">{item.title}</h3>
         <p className="text-sm text-gray-400 mb-4">{item.description}</p>
         <div className="flex flex-wrap gap-2 mt-auto">
           {item.tags.map(tag => (

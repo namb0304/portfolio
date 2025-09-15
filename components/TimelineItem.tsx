@@ -14,7 +14,7 @@ const TimelineItem = ({ item }: TimelineItemProps) => {
       </div>
       <div className="order-1 bg-gray-800 rounded-lg shadow-xl w-full md:w-5/12 px-6 py-4">
         <p className="text-sm text-gray-400">{item.date}</p>
-        <h3 className="mb-3 font-bold text-white text-xl">{item.title}</h3>
+        <h3 className="mb-3 font-bold text-white text-xl whitespace-pre-line">{item.title}</h3>
         <p className="text-sm leading-snug tracking-wide text-gray-300">
           {item.description}
         </p>
