@@ -20,9 +20,9 @@ const ProfileHeader = () => {
   // --- ここまで ---
 
   return (
-    // ↓↓↓ この行に scroll-mt-16 を追加 ↓↓↓
     <section id="profile" className="pt-24 md:pt-16 scroll-mt-16">
-      <div className="h-48 md:h-90 bg-gray-700 relative">
+      {/* ↓↓↓ md:h-90 を md:h-96 に修正しました ↓↓↓ */}
+      <div className="h-48 md:h-96 bg-gray-700 relative">
         <Image
           src="/images/hero-background.jpg"
           alt="Banner"
@@ -41,30 +41,29 @@ const ProfileHeader = () => {
             />
           </button>
           <div className="pt-6 pb-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 md:items-start">
               <div className="md:col-span-1">
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-              {siteConfig.author.name}
-            </h1>
-            {/* 英語名を追加 */}
-            <p className="mt-2 text-xl font-dancing-script text-gray-300">
-                {siteConfig.author.nameEn}
-            </p>
-            <p className="mt-4 text-md text-gray-400 flex items-center gap-2">
-              <FaUniversity />
-              {affiliation}
-            </p>
-          </div>
-              <div className="md:col-span-2 md:-translate-y-15">
-                {/* 1. キャッチコピーの修正 */}
+                  {siteConfig.author.name}
+                </h1>
+                <p className="mt-2 text-xl font-dancing-script text-gray-300">
+                  {siteConfig.author.nameEn}
+                </p>
+                <p className="mt-4 text-md text-gray-400 flex items-center gap-2">
+                  <FaUniversity />
+                  {affiliation}
+                </p>
+              </div>
+              {/* ↓↓↓ md:-translate-y-15 を md:-translate-y-16 に修正しました ↓↓↓ */}
+              <div className="md:col-span-2 md:-translate-y-16">
                 <blockquote className="pl-4 border-l-4 border-cyan-400">
                   <p className="text-xl italic text-white leading-relaxed">
                     {`"${siteConfig.author.catchphrase}"`}
                   </p>
                 </blockquote>
-                {/* 2. 自己紹介文の修正 */}
-                <p className="mt-9 max-w-3xl text-lg text-gray-200 leading-relaxed whitespace-pre-line">
-                    {siteConfig.author.bio}
+                {/* ↓↓↓ mt-9 を mt-8 に修正しました ↓↓↓ */}
+                <p className="mt-8 max-w-3xl text-lg text-gray-200 leading-relaxed whitespace-pre-line">
+                  {siteConfig.author.bio}
                 </p>
               </div>
             </div>
