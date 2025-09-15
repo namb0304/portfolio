@@ -59,7 +59,7 @@ const ProfileHeader = () => {
                 {/* 1. キャッチコピーの修正 */}
                 <blockquote className="pl-4 border-l-4 border-cyan-400">
                   <p className="text-xl italic text-white leading-relaxed">
-                    "{siteConfig.author.catchphrase}"
+                    {`"${siteConfig.author.catchphrase}"`}
                   </p>
                 </blockquote>
                 {/* 2. 自己紹介文の修正 */}
