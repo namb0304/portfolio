@@ -32,7 +32,7 @@ const Timeline: React.FC = () => {
           Activities
         </span>
       </h2>
-      <p className="text-center text-gray-400 mb-8">私が歩んできた学びや経験を時系列でまとめた記録です</p>
+      <p className="text-center text-gray-400 mb-8">大学から歩んできた学びや経験を時系列でまとめた記録です</p>
       
       {/* === コントロールパネル === */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mb-12">
