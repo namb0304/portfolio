@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "My Portfolio",
-  description: "これは私のポートフォリオサイトです。",
+  description: "南保俊輔についてのポートフォリオサイトです。",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
