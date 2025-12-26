@@ -1,7 +1,7 @@
+import Image from 'next/image';
+
 const GitHubActivity = () => {
-
   const chartUrl = "https://ghchart.rshah.org/namb0304?theme=onedark";
-
   const statsUrl = "https://github-readme-stats.vercel.app/api?username=namb0304&show_icons=true&theme=onedark&rank_icon=github";
 
 
@@ -37,17 +37,27 @@ const GitHubActivity = () => {
       </p>
       <div className="flex flex-col items-center gap-8">
         {/* GitHub Chart API を使った活動グラフ */}
-        <img 
-          src={chartUrl} 
-          alt="GitHub Contributions Chart" 
-          className="w-full max-w-3xl"
-        />
+        <div className="w-full max-w-3xl relative">
+          <Image
+            src={chartUrl}
+            alt="GitHub Contributions Chart"
+            width={896}
+            height={112}
+            className="w-full h-auto"
+            unoptimized
+          />
+        </div>
         {/* GitHub Readme Stats を使った詳細ステータス */}
-        <img 
-          src={statsUrl} 
-          alt="GitHub Stats" 
-          className="w-full max-w-md"
-        />
+        <div className="w-full max-w-md relative">
+          <Image
+            src={statsUrl}
+            alt="GitHub Stats"
+            width={495}
+            height={195}
+            className="w-full h-auto"
+            unoptimized
+          />
+        </div>
       </div>
     </section>
   );

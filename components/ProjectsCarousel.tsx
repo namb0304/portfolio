@@ -1,33 +1,21 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { siteConfig } from '@/config';
 import Image from 'next/image';
 import { FaGithub, FaLink } from 'react-icons/fa';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useEmblaSelected } from '@/hooks/useEmblaSelected';
 
 const ProjectsCarousel = () => {
   const { projects } = siteConfig;
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false, 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
     align: 'center',
     containScroll: false,
   });
 
-  const [selected, setSelected] = useState(0);
-
-  const updateClasses = useCallback(() => {
-    if (!emblaApi) return;
-    const selectedIndex = emblaApi.selectedScrollSnap();
-    setSelected(selectedIndex);
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    updateClasses();
-    emblaApi.on('select', updateClasses);
-    emblaApi.on('reInit', updateClasses);
-  }, [emblaApi, updateClasses]);
+  const selected = useEmblaSelected(emblaApi);
 
   return (
     <section id="projects" className="container mx-auto p-4 md:p-1 scroll-mt-16">

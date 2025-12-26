@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { memo } from 'react';
 import { FaGithub, FaLink } from 'react-icons/fa';
 import { siteConfig } from '@/config';
 
@@ -7,7 +8,7 @@ type ProjectCardProps = {
   project: Project;
 };
 
-const ProjectCard = ({ project }: ProjectCardProps) => {
+const ProjectCard = memo(({ project }: ProjectCardProps) => {
   // カード全体のリンク先を決定（デモURL > GitHub URL > リンクなし）
   const primaryUrl = project.url !== 'なし' ? project.url : project.github !== 'なし' ? project.github : undefined;
 
@@ -59,6 +60,8 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       </div>
     </div>
   );
-};
+});
+
+ProjectCard.displayName = 'ProjectCard';
 
 export default ProjectCard;

@@ -1,10 +1,8 @@
 import ProfileHeader from '@/components/ProfileHeader';
 import Skills from '@/components/Skills';
 import GitHubActivity from '@/components/GitHubActivity';
-import ProjectsCarousel from '@/components/ProjectsCarousel';
-import ProjectsSection from '@/components/ProjectsSection'; 
+import ProjectsSection from '@/components/ProjectsSection';
 import Timeline from '@/components/Timeline';
-import { siteConfig } from '@/config';
 import MotionWrap from '@/components/MotionWrap';
 import Contact from '@/components/Contact';
 
