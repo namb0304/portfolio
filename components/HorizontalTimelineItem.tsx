@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { siteConfig } from '@/config';
 
 type Item = typeof siteConfig.timeline[0];
@@ -5,7 +6,7 @@ type TimelineItemProps = {
   item: Item;
 };
 
-const HorizontalTimelineItem = ({ item }: TimelineItemProps) => {
+const HorizontalTimelineItem = memo(({ item }: TimelineItemProps) => {
   return (
     <div className="flex-shrink-0 w-72 md:w-80 p-4 transition-transform duration-300 hover:-translate-y-2">
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 relative h-full flex flex-col">
@@ -24,6 +25,8 @@ const HorizontalTimelineItem = ({ item }: TimelineItemProps) => {
       </div>
     </div>
   );
-};
+});
+
+HorizontalTimelineItem.displayName = 'HorizontalTimelineItem';
 
 export default HorizontalTimelineItem;

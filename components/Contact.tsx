@@ -1,18 +1,14 @@
 "use client";
 
-import { useState } from 'react';
 import { siteConfig } from '@/config';
 import { FaEnvelope, FaGithub, FaCopy, FaCheck } from 'react-icons/fa';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 
 const Contact = () => {
-  const [isCopied, setIsCopied] = useState(false);
+  const { isCopied, copyToClipboard } = useCopyToClipboard();
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText(siteConfig.author.email);
-    setIsCopied(true);
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 2500);
+    copyToClipboard(siteConfig.author.email);
   };
 
   return (

@@ -5,6 +5,7 @@ import { siteConfig } from '@/config';
 import { FaArrowUp, FaArrowDown, FaChartLine, FaListUl } from 'react-icons/fa';
 import HorizontalTimelineItem from './HorizontalTimelineItem';
 import TimelineItem from './TimelineItem';
+import FilterButton from './FilterButton';
 
 const Timeline: React.FC = () => {
   const { timeline: historyItems } = siteConfig;
@@ -26,8 +27,8 @@ const Timeline: React.FC = () => {
   }, [activeTag, sortOrder, historyItems]);
 
   return (
-    <section id="timeline" className="container mx-auto p-4 md:p-8 scroll-mt-22">
-      <h2 className="text-3xl font-bold text-center mb-4">
+    <section id="timeline" className="container mx-auto p-4 md:p-8 scroll-mt-22" aria-labelledby="timeline-title">
+      <h2 id="timeline-title" className="text-3xl font-bold text-center mb-4">
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
           Activities
         </span>
@@ -37,30 +38,57 @@ const Timeline: React.FC = () => {
       {/* === コントロールパネル === */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mb-12">
         <div className="flex flex-wrap justify-center gap-2">
-          <button onClick={() => setActiveTag(null)} className={`px-3 py-1 rounded-full text-sm font-semibold transition-colors ${!activeTag ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
-            すべて
-          </button>
+          <FilterButton
+            label="すべて"
+            isActive={!activeTag}
+            onClick={() => setActiveTag(null)}
+          />
           {allTags.map(tag => (
-            <button key={tag} onClick={() => setActiveTag(tag)} className={`px-3 py-1 rounded-full text-sm font-semibold transition-colors ${activeTag === tag ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
-              {tag}
-            </button>
+            <FilterButton
+              key={tag}
+              label={tag}
+              isActive={activeTag === tag}
+              onClick={() => setActiveTag(tag)}
+            />
           ))}
         </div>
         
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full">
-            <button onClick={() => setLayout('horizontal')} className={`p-2 rounded-full transition-colors ${layout === 'horizontal' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`} title="横表示">
+          <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full" role="group" aria-label="タイムライン表示レイアウト選択">
+            <button
+              onClick={() => setLayout('horizontal')}
+              className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${layout === 'horizontal' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+              title="横表示"
+              aria-label="横表示に切り替え"
+              aria-pressed={layout === 'horizontal'}
+            >
               <FaChartLine className="text-lg" />
             </button>
-            <button onClick={() => setLayout('vertical')} className={`p-2 rounded-full transition-colors ${layout === 'vertical' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`} title="縦表示">
+            <button
+              onClick={() => setLayout('vertical')}
+              className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${layout === 'vertical' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+              title="縦表示"
+              aria-label="縦表示に切り替え"
+              aria-pressed={layout === 'vertical'}
+            >
               <FaListUl className="text-lg" />
             </button>
           </div>
-          <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full whitespace-nowrap">
-            <button onClick={() => setSortOrder('asc')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${sortOrder === 'asc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
+          <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full whitespace-nowrap" role="group" aria-label="並び順選択">
+            <button
+              onClick={() => setSortOrder('asc')}
+              className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${sortOrder === 'asc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+              aria-label="古い順に並び替え"
+              aria-pressed={sortOrder === 'asc'}
+            >
               <FaArrowUp /> 古い順
             </button>
-            <button onClick={() => setSortOrder('desc')} className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors ${sortOrder === 'desc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}>
+            <button
+              onClick={() => setSortOrder('desc')}
+              className={`px-3 py-1 flex items-center gap-1.5 rounded-full text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${sortOrder === 'desc' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+              aria-label="新しい順に並び替え"
+              aria-pressed={sortOrder === 'desc'}
+            >
               <FaArrowDown /> 新しい順
             </button>
           </div>

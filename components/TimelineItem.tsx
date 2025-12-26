@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { siteConfig } from '@/config';
 
 type Item = typeof siteConfig.timeline[0];
@@ -5,7 +6,7 @@ type TimelineItemProps = {
   item: Item;
 };
 
-const TimelineItem = ({ item }: TimelineItemProps) => {
+const TimelineItem = memo(({ item }: TimelineItemProps) => {
   return (
     <div className="mb-8 flex justify-between md:flex-row-reverse items-start w-full left-timeline">
       <div className="order-1 w-5/12 hidden md:block"></div>
@@ -28,6 +29,8 @@ const TimelineItem = ({ item }: TimelineItemProps) => {
       </div>
     </div>
   );
-};
+});
+
+TimelineItem.displayName = 'TimelineItem';
 
 export default TimelineItem;

@@ -21,14 +21,18 @@ const GlobalHeader = () => {
     <header className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 border-b border-gray-700">
-          <Link href="/" className="text-xl font-bold">
+          <Link href="/" className="text-xl font-bold" aria-label="ホームページへ">
             My Portfolio
           </Link>
 
           {/* PC用のナビゲーション (画面がmd以上で表示) */}
-          <nav className="hidden md:flex space-x-6 text-sm">
+          <nav className="hidden md:flex space-x-6 text-sm" aria-label="メインナビゲーション">
             {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className="text-gray-300 hover:text-white transition-colors">
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-gray-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded px-2 py-1"
+              >
                 {link.label}
               </a>
             ))}
@@ -36,7 +40,13 @@ const GlobalHeader = () => {
 
           {/* スマホ用のハンバーガーボタン (画面がmd未満で表示) */}
           <div className="md:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="z-50 text-white">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="z-50 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded p-1"
+              aria-label={isMenuOpen ? "メニューを閉じる" : "メニューを開く"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+            >
               {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
@@ -45,14 +55,18 @@ const GlobalHeader = () => {
 
       {/* スマホ用のドロップダウンメニュー (isMenuOpenがtrueのときだけ表示) */}
       {isMenuOpen && (
-        <nav className="absolute top-0 left-0 w-full bg-gray-900 pt-16 border-b border-gray-700 md:hidden">
+        <nav
+          id="mobile-menu"
+          className="absolute top-0 left-0 w-full bg-gray-900 pt-16 border-b border-gray-700 md:hidden"
+          aria-label="モバイルナビゲーション"
+        >
           <ul className="flex flex-col items-center space-y-6 py-8">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a 
-                  href={link.href} 
-                  onClick={() => setIsMenuOpen(false)} // リンククリックでメニューを閉じる
-                  className="text-lg text-gray-300 hover:text-white transition-colors"
+                <a
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-lg text-gray-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded px-3 py-1"
                 >
                   {link.label}
                 </a>
