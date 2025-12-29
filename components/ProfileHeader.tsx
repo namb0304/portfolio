@@ -21,8 +21,8 @@ const ProfileHeader = () => {
 
   return (
     <section id="profile" className="pt-24 md:pt-16 scroll-mt-16">
-      {/* ↓↓↓ md:h-90 を md:h-96 に修正しました ↓↓↓ */}
-      <div className="h-48 md:h-96 bg-gray-700 relative">
+      {/* ↓↓↓ md:h-90 を md:h-88 に修正しました ↓↓↓ */}
+      <div className="h-48 md:h-88 bg-gray-700 relative">
         <Image
           src="/images/hero-background.jpg"
           alt="Banner"

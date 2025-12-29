@@ -103,7 +103,7 @@ export const siteConfig = {
     },
     {
         title: "モバオル",
-        description: "学部内ハッカソンで開発したモバイルオーダーシステムです。",
+        description: "学部内ハッカソン期間中に開発したモバイルオーダーシステムです。",
         category: "university",
         tags: ["Python", "Flask", "SQLite"],
         image: "/projects/project-mobaoru.png",
@@ -112,11 +112,20 @@ export const siteConfig = {
     },
     {
       title: "Thanks",
-      description: "RSS Hackathon 2025で開発した、感謝をつなげるSNSです。",
+      description: "RSS Hackathon 2025で制作した、感謝をつなげるSNSです。",
       category: "hackathon",
       tags: ["Vue.js", "firebase", "vercel"],
       image: "/projects/project-thanks.png",
       url: "https://rss-hackathon-namelesz-k1f8bbvz1-shunsukenambo-8040s-projects.vercel.app/",
+      github: "https://github.com/namb0304/RSS_Hackathon_namelesz.git",
+    },
+    {
+      title: "Thank x Chain",
+      description: "技育展2025の予選会に向けたThanksの改良版です。コンセプトの見直しからリファクタリング・UI/UXの改善などを重点的に行いました。",
+      category: "hackathon",
+      tags: ["Vue.js", "firebase", "vercel"],
+      image: "/projects/project-thanks_x_chain.png",
+      url: "https://thanks.jkotqmrr.com/",
       github: "https://github.com/namb0304/RSS_Hackathon_namelesz.git",
     },
     {
@@ -130,7 +139,7 @@ export const siteConfig = {
     },
     {
         title: "AIによる画像分析とSNS機能を統合したファッション共有・提案システム", 
-        description: "ゼミ合宿で開発した、AIを活用したファッションとSNSの融合サービスです。主にフロントエンドを担当しました。",
+        description: "2025年のゼミ合宿で開発した、AIを活用したファッションとSNSの融合サービスです。メイン機能の実装を担当しました。",
         category: "zemi",
         tags: ["php","python","AI"],
         image: "/projects/project-ai-fashion.png",
@@ -148,13 +157,14 @@ export const siteConfig = {
     },
     {
         title: "chrome拡張機能によるタブ管理ツール",
-        description: "reactとfastapiの勉強のために開発したchrome拡張機能のタブ管理ツールです。",
+        description: "reactとfastapiとdockerの勉強のために開発したchrome拡張機能のタブ管理ツールです。",
         category: "personal",
-        tags: ["開発","勉強","chrome拡張機能","react","fastapi"],
+        tags: ["開発","勉強","chrome拡張機能","react","fastapi","docker"],
         image: "/projects/project-chrome-extension.png",
         url: "なし",
         github: "https://github.com/namb0304/react-fastapi.app.git"
     }
+    
   ],
   
   // タイムライン用のデータ
@@ -220,7 +230,24 @@ export const siteConfig = {
       description: "Next.js,Tailwind CSS,vercelなどを使用して、自身のポートフォリオサイトを制作・公開しました。",
       tags: ["開発"],
     },
-
+    {
+      date: "2025年11月",
+      title: "技育展2025 予選会に参加",
+      description: "RSS Hackathonで制作したThanksを改良し、技育展2025の予選会に参加しました。予選を通過することはできませんでしたが、納得のいく作品に仕上げることができました。",
+      tags: ["ハッカソン", "開発"],
+    },
+    {
+      date: "2025年11月",
+      title: "実店舗向けモバイルオーダーシステム「Hirolia」共同開発 始動",
+      description: "経営学部の友人に実際の店舗での運用を想定したモバイルオーダーシステムの実装を依頼され、同じ学部のメンバーと共同で設計・開発を開始しました。",
+      tags: ["開発", "共同開発"],
+    },
+    {
+      date: "2025年12月",
+      title: "第2回MUDSハッカソンに参加",
+      description: "学部内で開催された2回目のハッカソンに参加しました。「Hirolia」のプロトタイプを開発しました。賞は取れませんでしたがシステムの大枠を完成させることができました。",
+      tags: ["開発", "共同開発", "ハッカソン","大学"],
+    },
 
     // === ここまで追加データ ===
     ],
