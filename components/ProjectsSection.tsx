@@ -38,8 +38,8 @@ const ProjectsSection = () => {
           </button>
         </div>
       </div>
-      <p className="text-center text-gray-400 mb-8">私の今までの個人開発やハッカソンでの制作物です
-        <br />右下にGitHubと制作物のリンクがあるので是非ご覧ください!
+      <p className="text-center text-gray-400 mb-5">私の今までの個人開発やハッカソンでの制作物です
+        <br />右下にGitHubと制作物のリンクがあるので是非ご覧ください！
       </p>
       {/* === レイアウトに応じて表示を切り替え === */}
       <div role="region" aria-live="polite" aria-label="プロジェクト一覧">
