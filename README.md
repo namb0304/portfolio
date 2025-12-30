@@ -113,14 +113,38 @@ cd portfolio
 npm install
 ```
 
-3. **環境変数の設定（必要に応じて）**
+3. **環境変数の設定（EmailJS設定）**
 
-プロジェクトルートに `.env.local` ファイルを作成します（現在は環境変数不要ですが、今後追加する場合に備えて）。
+お問い合わせフォームを動作させるために、EmailJSの環境変数を設定する必要があります。
+
+#### EmailJSのセットアップ手順
+
+1. [EmailJS](https://www.emailjs.com/) にアクセスしてアカウントを作成（無料プランでOK）
+2. **Email Services** でGmailなどのメールサービスを連携
+3. **Email Templates** で新しいテンプレートを作成:
+   ```
+   件名: {{subject}}
+
+   差出人: {{from_name}}
+   メールアドレス: {{from_email}}
+
+   メッセージ:
+   {{message}}
+   ```
+4. **Account** → **General** でPublic Keyを取得
+
+#### 環境変数ファイルの作成
+
+プロジェクトルートに `.env.local` ファイルを作成します。
 
 ```bash
-# 例: 将来的にAPIキーなどが必要な場合
-# NEXT_PUBLIC_API_KEY=your_api_key
+# EmailJS設定
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
 ```
+
+**重要**: `.env.local` ファイルは `.gitignore` に含まれているため、GitHubにプッシュされません。Vercelデプロイ時は、Vercelの環境変数設定で同じ値を設定してください。
 
 ## 💻 開発方法
 
@@ -166,10 +190,16 @@ npm run lint
 2. 「New Project」をクリック
 3. GitHubリポジトリを連携
 4. このリポジトリ（portfolio）を選択
-5. 「Deploy」ボタンをクリック
+5. **Environment Variables** で以下を設定:
+   - `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
+   - `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
+   - `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
+6. 「Deploy」ボタンをクリック
 
 デプロイは自動的に実行され、数分で完了します。
 mainブランチにプッシュすると、自動的に再デプロイされます。
+
+**注意**: 環境変数を後から追加・変更した場合は、Vercelで再デプロイが必要です。
 
 ### その他のデプロイ先
 
