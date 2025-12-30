@@ -27,6 +27,7 @@ const ProfileHeader = () => {
           src="/images/hero-background.jpg"
           alt="Banner"
           fill
+          sizes="100vw"
           className="object-cover"
         />
       </div>
@@ -37,6 +38,7 @@ const ProfileHeader = () => {
               src="/images/profile-icon.jpg"
               alt={siteConfig.author.name}
               fill
+              sizes="(max-width: 768px) 128px, 160px"
               className="rounded-full border-4 border-gray-900 bg-gray-900 object-cover"
             />
           </button>

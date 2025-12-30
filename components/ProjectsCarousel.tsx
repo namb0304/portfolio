@@ -39,7 +39,13 @@ const ProjectsCarousel = () => {
                   <div className={`embla__slide ${slideClass}`} key={index}>
                     <div className="relative w-full h-[400px] bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
                       <div className="relative h-1/2">
-                        <Image src={project.image} alt={project.title} fill className="object-cover" />
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover"
+                        />
                       </div>
                       <div className="p-4 flex flex-col h-1/2">
                         <h3 className="text-xl font-bold mb-2">{project.title}</h3>
