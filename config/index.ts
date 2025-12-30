@@ -1,20 +1,18 @@
-import { title } from 'process';
-import { 
-  FaPython, 
-  FaDocker, 
-  FaPhp, 
+import {
+  FaPython,
+  FaDocker,
+  FaPhp,
   FaHtml5,      // 修正
-  FaCss3Alt, 
+  FaCss3Alt,
   FaGithub,
   FaDatabase    // 修正 (NoSQLの汎用アイコンとして)
 } from 'react-icons/fa';
-import { 
-  SiJavascript, 
-  SiFirebase, 
+import {
+  SiJavascript,
+  SiFirebase,
   SiTypescript,
-  SiSupabase,
-  SiPostgresql, 
-  SiSqlite,  
+  SiPostgresql,
+  SiSqlite,
   SiFlutter,
 } from 'react-icons/si';
 // ↑↑↑ ここまで ↑↑↑
