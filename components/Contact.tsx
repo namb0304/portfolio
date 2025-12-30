@@ -88,7 +88,7 @@ const Contact = () => {
         </h2>
         <p className="text-gray-400 max-w-xl mx-auto mb-12">
           <br />
-          お仕事のご相談やご依頼など、お気軽にご連絡ください。
+          お仕事のご相談やご依頼など、お気軽にご連絡ください
         </p>
       </div>
 
