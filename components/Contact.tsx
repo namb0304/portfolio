@@ -79,7 +79,7 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="container mx-auto p-4 md:p-8 scroll-mt-16">
+    <section id="contact" className="container mx-auto p-4 md:p-8 scroll-mt-24">
       <div className="text-center">
         <h2 className="text-3xl font-bold">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
