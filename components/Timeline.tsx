@@ -11,7 +11,7 @@ const Timeline: React.FC = () => {
   const { timeline: historyItems } = siteConfig;
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [layout, setLayout] = useState<'horizontal' | 'vertical'>('vertical');
 
   const allTags = [...new Set(historyItems.flatMap(item => item.tags))];
 
@@ -56,15 +56,6 @@ const Timeline: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full" role="group" aria-label="タイムライン表示レイアウト選択">
             <button
-              onClick={() => setLayout('horizontal')}
-              className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${layout === 'horizontal' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
-              title="横表示"
-              aria-label="横表示に切り替え"
-              aria-pressed={layout === 'horizontal'}
-            >
-              <FaChartLine className="text-lg" />
-            </button>
-            <button
               onClick={() => setLayout('vertical')}
               className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${layout === 'vertical' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
               title="縦表示"
@@ -72,6 +63,15 @@ const Timeline: React.FC = () => {
               aria-pressed={layout === 'vertical'}
             >
               <FaListUl className="text-lg" />
+            </button>
+            <button
+              onClick={() => setLayout('horizontal')}
+              className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 ${layout === 'horizontal' ? 'bg-cyan-500 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+              title="横表示"
+              aria-label="横表示に切り替え"
+              aria-pressed={layout === 'horizontal'}
+            >
+              <FaChartLine className="text-lg" />
             </button>
           </div>
           <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-full whitespace-nowrap" role="group" aria-label="並び順選択">

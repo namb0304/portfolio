@@ -37,8 +37,8 @@ const ProjectsCarousel = () => {
 
                 return (
                   <div className={`embla__slide ${slideClass}`} key={index}>
-                    <div className="relative w-full h-[400px] bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
-                      <div className="relative h-1/2">
+                    <div className="relative w-full h-[450px] md:h-[400px] bg-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+                      <div className="relative h-[200px] md:h-1/2 flex-shrink-0">
                         <Image
                           src={project.image}
                           alt={project.title}
@@ -47,10 +47,10 @@ const ProjectsCarousel = () => {
                           className="object-cover"
                         />
                       </div>
-                      <div className="p-4 flex flex-col h-1/2">
-                        <h3 className="text-xl font-bold mb-2">{project.title}</h3>
-                        <p className="text-gray-400 text-sm mb-3 flex-grow overflow-hidden">{project.description}</p>
-                        <div className="flex items-center justify-between">
+                      <div className="p-4 flex flex-col flex-1 min-h-0">
+                        <h3 className="text-lg md:text-xl font-bold mb-2 flex-shrink-0">{project.title}</h3>
+                        <p className="text-gray-400 text-sm mb-3 flex-1 overflow-auto line-clamp-3 md:line-clamp-none">{project.description}</p>
+                        <div className="flex items-center justify-between flex-shrink-0 gap-2">
                           <div className="flex flex-wrap gap-2">
                             {project.tags.slice(0, 3).map((tag) => (
                               <span key={tag} className="bg-gray-700 text-cyan-400 text-xs font-semibold px-2 py-0.5 rounded-full">{tag}</span>

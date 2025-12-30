@@ -10,10 +10,11 @@ import {
 import {
   SiJavascript,
   SiFirebase,
-  SiTypescript,
   SiPostgresql,
   SiSqlite,
   SiFlutter,
+  SiVercel,
+  SiRender,
 } from 'react-icons/si';
 // ↑↑↑ ここまで ↑↑↑
 
@@ -49,13 +50,9 @@ export const siteConfig = {
         frameworks: ['Tailwind CSS']
       },
       {
-        name: 'JavaScript',
+        name: 'JavaScript / TypeScript',
         icon: SiJavascript,
         frameworks: ['React', 'Vue.js', 'Next.js']
-      },
-      {
-        name: 'TypeScript',
-        icon: SiTypescript,
       },
     ],
     backend: [
@@ -77,8 +74,10 @@ export const siteConfig = {
     tools: [
       { name: 'GitHub', icon: FaGithub },
       { name: 'Firebase', icon: SiFirebase },
-      { name: 'Docker', icon: FaDocker },   
-      { name: 'Flutter', icon: SiFlutter },      // 修正: FaGitAlt -> SiFlutter
+      { name: 'Docker', icon: FaDocker },
+      { name: 'Flutter', icon: SiFlutter },
+      { name: 'Vercel', icon: SiVercel },
+      { name: 'Render', icon: SiRender },
     ]
   },
 
