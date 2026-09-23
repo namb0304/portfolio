@@ -14,6 +14,7 @@ import {
   FaLightbulb,
 } from "react-icons/fa6";
 import { TECH } from "./techIcons";
+import { useContactForm } from "@/hooks/useContactForm";
 import { v3Activities, v3Experience, v3Profile, v3Skills } from "@/config/v3";
 
 
@@ -406,13 +407,18 @@ export function GitHubActivity() {
 /* ------------------------------------------------------------------ Contact */
 
 export function Contact() {
+  const { values, errors, status, setField, submit } = useContactForm();
+  const sending = status === "sending";
+
+  const fields = [
+    { key: "name" as const, id: "v3-name", label: "お名前", type: "text", required: true },
+    { key: "email" as const, id: "v3-email", label: "メールアドレス", type: "email", required: true },
+    { key: "subject" as const, id: "v3-subject", label: "件名", type: "text", required: false },
+  ];
+
   return (
-    <section
-      id="contact"
-      className="scroll-mt-24 bg-[var(--v3-surface)]/45"
-    >
-      {/* 見出し・本文・フォームを同じ幅の1列に揃える。
-          「中央寄せなのにフォームだけ左へ流れている」状態をなくす。 */}
+    <section id="contact" className="scroll-mt-24 bg-[var(--v3-surface)]/45">
+      {/* 見出し・本文・フォームを同じ幅の1列に揃える。 */}
       <div className="mx-auto max-w-[620px] px-6 py-24 md:py-32">
         <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
           連絡先
@@ -422,37 +428,46 @@ export function Contact() {
           採用・インターン・開発について、このサイトを見て気になったことがあればお聞かせください。
         </p>
 
-        {/*
-          このラボページのフォームは見た目の検証用で、送信処理は繋いでいない。
-          個人のメールアドレスは画面にもHTMLにも、このページの client JS にも入れていない。
-        */}
-        <form
-          className="mt-10 space-y-6"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          {[
-            { id: "v3-name", label: "お名前", type: "text", required: true },
-            { id: "v3-email", label: "メールアドレス", type: "email", required: true },
-            { id: "v3-subject", label: "件名", type: "text", required: false },
-          ].map((f) => (
-            <div key={f.id}>
-              <label
-                htmlFor={f.id}
-                className="mb-2 block text-[13px] font-medium text-[var(--v3-fg-2)]"
-              >
-                {f.label}
-                {f.required && (
-                  <span className="ml-1 text-[var(--v3-accent)]">*</span>
+        <form className="mt-10 space-y-6" onSubmit={submit} noValidate>
+          {fields.map((f) => {
+            const err = errors[f.key];
+            return (
+              <div key={f.id}>
+                <label
+                  htmlFor={f.id}
+                  className="mb-2 block text-[13px] font-medium text-[var(--v3-fg-2)]"
+                >
+                  {f.label}
+                  {f.required && (
+                    <span className="ml-1 text-[var(--v3-accent)]">*</span>
+                  )}
+                </label>
+                <input
+                  id={f.id}
+                  type={f.type}
+                  value={values[f.key]}
+                  onChange={(e) => setField(f.key, e.target.value)}
+                  disabled={sending}
+                  aria-invalid={err ? true : undefined}
+                  aria-describedby={err ? `${f.id}-error` : undefined}
+                  className={`w-full rounded-[12px] border bg-[var(--v3-surface)] px-4 py-3 text-[15px] text-[var(--v3-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)] disabled:opacity-60 ${
+                    err
+                      ? "border-[#E0796B]"
+                      : "border-[var(--v3-rule)] focus:border-[var(--v3-accent)]"
+                  }`}
+                />
+                {/* 色だけでエラーを示さない。文言も必ず出す。 */}
+                {err && (
+                  <p
+                    id={`${f.id}-error`}
+                    className="mt-2 text-[12px] leading-6 text-[#E0796B]"
+                  >
+                    {err}
+                  </p>
                 )}
-              </label>
-              <input
-                id={f.id}
-                type={f.type}
-                required={f.required}
-                className="w-full rounded-[12px] border border-[var(--v3-rule)] bg-[var(--v3-surface)] px-4 py-3 text-[15px] text-[var(--v3-fg)] transition-colors focus:border-[var(--v3-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
-              />
-            </div>
-          ))}
+              </div>
+            );
+          })}
 
           <div>
             <label
@@ -464,20 +479,47 @@ export function Contact() {
             <textarea
               id="v3-message"
               rows={5}
-              required
-              className="w-full resize-y rounded-[12px] border border-[var(--v3-rule)] bg-[var(--v3-surface)] px-4 py-3 text-[15px] leading-7 text-[var(--v3-fg)] transition-colors focus:border-[var(--v3-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+              value={values.message}
+              onChange={(e) => setField("message", e.target.value)}
+              disabled={sending}
+              aria-invalid={errors.message ? true : undefined}
+              aria-describedby={errors.message ? "v3-message-error" : undefined}
+              className={`w-full resize-y rounded-[12px] border bg-[var(--v3-surface)] px-4 py-3 text-[15px] leading-7 text-[var(--v3-fg)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)] disabled:opacity-60 ${
+                errors.message
+                  ? "border-[#E0796B]"
+                  : "border-[var(--v3-rule)] focus:border-[var(--v3-accent)]"
+              }`}
             />
+            {errors.message && (
+              <p
+                id="v3-message-error"
+                className="mt-2 text-[12px] leading-6 text-[#E0796B]"
+              >
+                {errors.message}
+              </p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="rounded-[10px] bg-[var(--v3-fg)] px-7 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+            disabled={sending}
+            className="rounded-[10px] bg-[var(--v3-fg)] px-7 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
           >
-            送信する
+            {sending ? "送信中..." : "送信する"}
           </button>
 
-          <p className="text-[11px] leading-5 text-[var(--v3-fg-2)]/80">
-            ※ このページは見た目の検証用のため、送信処理は繋いでいません。
+          {/* 状態は読み上げにも伝える。内部エラーは出さない。 */}
+          <p role="status" aria-live="polite" className="text-[13px] leading-7">
+            {status === "success" && (
+              <span className="text-[var(--v3-accent)]">
+                送信しました。ありがとうございます。
+              </span>
+            )}
+            {status === "error" && (
+              <span className="text-[#E0796B]">
+                送信できませんでした。時間をおいてもう一度お試しください。
+              </span>
+            )}
           </p>
         </form>
       </div>

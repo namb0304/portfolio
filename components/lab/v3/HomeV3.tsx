@@ -161,17 +161,89 @@ export default function HomeV3() {
       </header>
 
       {/* ================= Hero / Profile ================================ */}
-      {/* visual anchor は本人。Hirolia の画像はここには置かない。
-          顔は歪めない・回さない。奥行きは「層」と「光」だけで出す。 */}
+      {/*
+        Desktop（lg以上）は従来のまま。
+        Mobile は専用構図にする。縦積みにすると写真だけで1画面目を使い切り、
+        名前・卒業年・方向性が押し出されてしまうため。
+      */}
       <section id="about" className="scroll-mt-24">
+        {/* ---------- Mobile ---------- */}
+        <div className="mx-auto max-w-[1180px] px-6 pt-8 pb-12 lg:hidden">
+          {/* 顔・名前・所属を1ブロックに。写真は認識できる最小限まで小さく。 */}
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0 overflow-hidden rounded-[16px] ring-1 ring-[var(--v3-rule)]">
+              <div className="relative h-[116px] w-[96px]">
+                <Image
+                  src={v3Profile.photo}
+                  alt="南保 俊輔"
+                  width={776}
+                  height={776}
+                  priority
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+            </div>
+
+            <div className="min-w-0">
+              <h1 className="text-[27px] font-bold leading-tight tracking-tight">
+                {v3Profile.name}
+              </h1>
+              <p className="mt-1 text-[12px] tracking-[0.12em] text-[var(--v3-fg-2)]">
+                {v3Profile.nameEn}
+              </p>
+              <p className="mt-2.5 text-[13px] leading-6 text-[var(--v3-fg-2)]">
+                {v3Profile.university} {grade}年
+                <span className="mt-0.5 block tabular-nums text-[var(--v3-fg)]">
+                  {graduationYear}年3月卒業予定
+                </span>
+              </p>
+            </div>
+          </div>
+
+          {/* 本人情報は entrance を待たせない。最初から読める。 */}
+          <p className="mt-7 text-[18px] font-medium leading-[1.8] [word-break:auto-phrase]">
+            {v3Profile.statement}
+          </p>
+          <p className="mt-3.5 text-[13px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
+            {v3Profile.statementSub}
+          </p>
+
+          <p className="mt-5 flex items-start gap-2.5 border-l border-[var(--v3-rule)] pl-3.5 text-[13px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
+            <span className="relative mt-2 flex h-[6px] w-[6px] shrink-0">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--v3-accent)] opacity-60 motion-safe:animate-ping" />
+              <span className="relative inline-flex h-[6px] w-[6px] rounded-full bg-[var(--v3-accent)]" />
+            </span>
+            <span>{v3Profile.proof}</span>
+          </p>
+
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <a
+              href="#projects"
+              className="group inline-flex items-center gap-2.5 rounded-[10px] bg-[var(--v3-fg)] px-5 py-2.5 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+            >
+              つくったものを見る
+              <FaArrowRight size={11} />
+            </a>
+            <a
+              href={v3Profile.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--v3-rule)] px-5 py-2.5 text-[14px] text-[var(--v3-fg-2)] transition-colors duration-200 hover:border-[var(--v3-accent)]/60 hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+            >
+              <FaGithub size={14} />
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        {/* ---------- Desktop（従来どおり） ---------- */}
         <div
           ref={hero.ref}
           onPointerMove={hero.onPointerMove}
           onPointerLeave={hero.onPointerLeave}
           style={{ "--mx": "50%", "--my": "50%" } as React.CSSProperties}
-          className="relative mx-auto grid max-w-[1180px] grid-cols-1 items-center gap-x-14 gap-y-10 px-6 py-14 md:px-10 md:py-20 lg:grid-cols-[320px_minmax(0,1fr)]"
+          className="relative mx-auto hidden max-w-[1180px] grid-cols-1 items-center gap-x-14 gap-y-10 px-6 py-14 md:px-10 md:py-20 lg:grid lg:grid-cols-[320px_minmax(0,1fr)]"
         >
-          {/* ポインタに合わせてゆっくり寄る光。要素の内側にしか出ない。 */}
           {hero.active && (
             <span
               aria-hidden="true"
@@ -183,18 +255,16 @@ export default function HomeV3() {
             />
           )}
 
-          {/* --- ポートレート（3層: 奥の面 / 罫 / 写真） --- */}
           <div
-            className="relative w-[220px] transition-all duration-[700ms] ease-out sm:w-[260px] lg:w-full"
+            className="relative w-full transition-all duration-[700ms] ease-out"
             style={{
               opacity: loaded ? 1 : 0,
               transform: loaded || reduced ? "none" : "translateY(10px)",
             }}
           >
-            {/* 奥の面。ポインタと逆方向にごくわずかに動く＝視差。 */}
             <div
               aria-hidden="true"
-              className="absolute -bottom-4 -left-4 h-full w-full rounded-[10px] border border-[var(--v3-rule)] bg-[var(--v3-navy)] transition-transform duration-[450ms] ease-out"
+              className="absolute -bottom-5 -left-5 h-full w-full rounded-[28px] border border-[var(--v3-rule)] bg-[var(--v3-navy)] transition-transform duration-[450ms] ease-out"
               style={
                 hero.active
                   ? {
@@ -218,7 +288,6 @@ export default function HomeV3() {
             </div>
           </div>
 
-          {/* --- 名乗りと方向性 --- */}
           <div>
             <h1
               className="text-[38px] font-bold leading-tight tracking-tight transition-all duration-[600ms] ease-out md:text-[46px]"
@@ -238,10 +307,9 @@ export default function HomeV3() {
               <p className="text-[13px] tracking-[0.12em] text-[var(--v3-fg-2)]">
                 {v3Profile.nameEn}
               </p>
-              {/* motif の小さな出番。読み込み時に一度だけ引かれる短い線。 */}
               <span
                 aria-hidden="true"
-                className="h-px flex-1 max-w-[120px] origin-left bg-[var(--v3-accent)] transition-transform duration-[700ms] ease-out"
+                className="h-px max-w-[120px] flex-1 origin-left bg-[var(--v3-accent)] transition-transform duration-[700ms] ease-out"
                 style={{
                   transform: loaded ? "scaleX(1)" : "scaleX(0)",
                   transitionDelay: "280ms",
@@ -262,7 +330,6 @@ export default function HomeV3() {
               <span className="tabular-nums">{graduationYear}年3月卒業予定</span>
             </p>
 
-            {/* ページ上で最も大きい文。目指している方向であって、現在の能力の主張ではない。 */}
             <p
               className="mt-7 max-w-[35rem] text-[19px] font-medium leading-[1.85] [word-break:auto-phrase] transition-all duration-[600ms] ease-out md:text-[23px]"
               style={{

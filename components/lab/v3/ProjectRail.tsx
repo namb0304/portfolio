@@ -17,7 +17,12 @@
  */
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FaArrowUpRightFromSquare, FaGithub } from "react-icons/fa6";
+import {
+  FaArrowUpRightFromSquare,
+  FaGithub,
+  FaPause,
+  FaPlay,
+} from "react-icons/fa6";
 import { TECH } from "./techIcons";
 import { usePrefersReducedMotion } from "./motion";
 import { v3Rail } from "@/config/v3";
@@ -34,8 +39,8 @@ const RESUME_DELAY = 1500; // ms
 const RAMP = 320; // ms
 /** レール上を通過しただけで止めないための滞在時間 */
 const HOVER_DWELL = 200; // ms
-/** これ以上動いたらドラッグとみなし、離したときのクリックを無効にする */
-const DRAG_SLOP = 6; // px
+/** 開始点からこれ以上動いたらドラッグとみなす（普通のクリックを誤判定しない） */
+const DRAG_THRESHOLD = 7; // px
 
 const SETS = 3;
 
@@ -71,10 +76,14 @@ function TechRow({ keys }: { keys: readonly string[] }) {
 function RailCard({
   item,
   clone,
+  setIndex,
+  index,
   suppressClick,
 }: {
   item: Item;
   clone: boolean;
+  setIndex: number;
+  index: number;
   suppressClick: React.MutableRefObject<boolean>;
 }) {
   const before = "beforeImage" in item ? item : null;
@@ -84,6 +93,8 @@ function RailCard({
       className="shrink-0"
       style={{ width: `min(${item.width}px, 82vw)` }}
       aria-hidden={clone || undefined}
+      data-set={setIndex}
+      data-idx={index}
     >
       <article
         style={{ "--card-accent": item.accent } as React.CSSProperties}
@@ -218,38 +229,80 @@ function RailCard({
 
 /* -------------------------------------------------------------------- rail */
 
+/** 自動を止めている理由。理由ごとに独立して持つ（1つの時刻変数で兼ねない）。 */
+type Blockers = {
+  hovered: boolean;
+  focused: boolean;
+  dragging: boolean;
+};
+
 export default function ProjectRail() {
   const reduced = usePrefersReducedMotion();
+
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLUListElement | null>(null);
 
-  // rAF 側だけが読む値。再レンダリングを起こしたくないので ref に置く。
-  const lastInput = useRef(0);
-  const holding = useRef(false); // ドラッグ中・ホバー滞在中など「触っている」状態
-  const suppressClick = useRef(false);
+  /** 停止理由。rAF から毎フレーム読むので ref で持つ（再描画を起こさない）。 */
+  const blockers = useRef<Blockers>({
+    hovered: false,
+    focused: false,
+    dragging: false,
+  });
+  /**
+   * すべての停止理由が解けた時刻 + 1500ms。これ未満では再開しない。
+   * 初期値は 0（＝マウント直後は待たずに動き出す）。Infinity にすると
+   * 停止理由が一度も発生しないまま永久に再開しない。
+   */
+  const resumeAt = useRef(0);
+  /** 小数を保ったスクロール位置。整数丸めをしないため自前で持つ。 */
+  const pos = useRef(0);
+  /** DOM から実測した1セット分の繰り返し幅（gap/padding 込み） */
+  const repeatW = useRef(0);
   const rampStart = useRef(0);
+  const suppressClick = useRef(false);
 
+  const [paused, setPaused] = useState(false);
   const [inView, setInView] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
 
-  /** 触った瞬間に自動を止める */
-  const markInput = useCallback(() => {
-    lastInput.current = performance.now();
-    rampStart.current = 0;
+  /** 停止理由が変わるたびに呼ぶ。全部解けたら 1500ms のカウントを始める。 */
+  const syncResume = useCallback(() => {
+    const b = blockers.current;
+    const blocked = b.hovered || b.focused || b.dragging;
+    if (blocked) {
+      resumeAt.current = Number.POSITIVE_INFINITY;
+      rampStart.current = 0;
+    } else {
+      resumeAt.current = performance.now() + RESUME_DELAY;
+    }
   }, []);
 
-  /* --- 画面内にあるときだけ動かす --- */
+  const setBlocker = useCallback(
+    (key: keyof Blockers, value: boolean) => {
+      if (blockers.current[key] === value) return;
+      blockers.current[key] = value;
+      syncResume();
+    },
+    [syncResume]
+  );
+
+  /* --- reduced motion なら初期状態を停止にする --- */
+  useEffect(() => {
+    if (reduced) setPaused(true);
+  }, [reduced]);
+
+  /* --- 画面内判定 --- */
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => setInView(e.isIntersecting),
-      { rootMargin: "0px", threshold: 0.15 }
-    );
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
+      threshold: 0.15,
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
-  /* --- タブが隠れたら止める --- */
+  /* --- タブの表示状態 --- */
   useEffect(() => {
     const onVis = () => setTabVisible(document.visibilityState === "visible");
     onVis();
@@ -257,153 +310,253 @@ export default function ProjectRail() {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  /* --- 3セットの中央へ正規化。ユーザー操作・自動のどちらでも同じ処理で効く。 --- */
-  const normalize = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    const one = el.scrollWidth / SETS;
-    if (one <= 0) return;
-    if (el.scrollLeft >= one * 2) el.scrollLeft -= one;
-    else if (el.scrollLeft < one * 0.5) el.scrollLeft += one;
+  /**
+   * 1セット分の繰り返し幅を DOM から実測する。
+   * scrollWidth/3 だと gap や左右 padding のぶんズレて loop 境界が飛ぶため、
+   * 「セット0 の先頭カード」と「セット1 の先頭カード」の offsetLeft 差を使う。
+   */
+  const measure = useCallback(() => {
+    const track = trackRef.current;
+    const list = listRef.current;
+    if (!track || !list) return;
+    const a = list.querySelector<HTMLElement>('[data-set="0"][data-idx="0"]');
+    const b = list.querySelector<HTMLElement>('[data-set="1"][data-idx="0"]');
+    if (!a || !b) return;
+    const w = b.offsetLeft - a.offsetLeft;
+    if (w <= 0) return;
+
+    const prev = repeatW.current;
+    repeatW.current = w;
+
+    // 初回、または幅が変わった時は中央セットの相対位置を保ったまま置き直す
+    if (!prev) {
+      pos.current = w;
+    } else if (prev !== w) {
+      const ratio = (pos.current - prev) / prev; // 中央セット内の進捗
+      pos.current = w + ratio * w;
+    }
+    track.scrollLeft = pos.current;
   }, []);
 
-  /* --- 初期位置を中央セットの頭に置く --- */
   useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    const place = () => {
-      const one = el.scrollWidth / SETS;
-      if (one > 0) el.scrollLeft = one;
+    measure();
+    const track = trackRef.current;
+    const list = listRef.current;
+    if (!track || !list) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+    ro.observe(list);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
     };
-    place();
-    const ro = new ResizeObserver(place);
-    ro.observe(el);
-    return () => ro.disconnect();
+  }, [measure]);
+
+  /** 中央セットへ正規化。境界で見た目が変わらないよう1セット幅ちょうどずらす。 */
+  const normalize = useCallback(() => {
+    const w = repeatW.current;
+    const track = trackRef.current;
+    if (!w || !track) return;
+    if (pos.current >= w * 2) {
+      pos.current -= w;
+      track.scrollLeft = pos.current;
+    } else if (pos.current < w * 0.5) {
+      pos.current += w;
+      track.scrollLeft = pos.current;
+    }
   }, []);
+
+  /* --- ユーザー自身のスクロール（trackpad / touch）を取り込む --- */
+  const onScroll = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    // 自動送りで書いた値との差が大きければ、ユーザー操作とみなして同期する
+    if (Math.abs(track.scrollLeft - pos.current) > 1.5) {
+      pos.current = track.scrollLeft;
+      resumeAt.current = performance.now() + RESUME_DELAY;
+      rampStart.current = 0;
+    }
+    normalize();
+  }, [normalize]);
 
   /* --- 自動送り本体 --- */
   useEffect(() => {
-    if (reduced || !inView || !tabVisible) return;
-    const el = trackRef.current;
-    if (!el) return;
+    const canRun = inView && tabVisible && !reduced && !paused;
+    if (!canRun) return;
+    const track = trackRef.current;
+    if (!track) return;
 
     let raf = 0;
     let prev = performance.now();
-    let carry = 0; // 1px 未満の端数を持ち越して、カクつきを防ぐ
 
     const tick = (now: number) => {
       const dt = Math.min(now - prev, 50); // タブ復帰直後の巨大な dt を捨てる
       prev = now;
 
-      const idle = now - lastInput.current;
-      if (!holding.current && idle >= RESUME_DELAY) {
+      const b = blockers.current;
+      const blocked = b.hovered || b.focused || b.dragging;
+
+      if (!blocked && now >= resumeAt.current && repeatW.current > 0) {
         if (!rampStart.current) rampStart.current = now;
-        // 0 → AUTO_SPEED へ ease-in（操作権が戻ったことを感じさせない）
         const t = Math.min((now - rampStart.current) / RAMP, 1);
         const speed = AUTO_SPEED * (t * t);
-        carry += (speed * dt) / 1000;
-        const step = Math.floor(carry);
-        if (step > 0) {
-          el.scrollLeft += step;
-          carry -= step;
-        }
+        // 小数のまま加算する。整数へ丸めると 120Hz で段付きになる。
+        pos.current += (speed * dt) / 1000;
+        track.scrollLeft = pos.current;
+        normalize();
       } else {
-        carry = 0;
+        rampStart.current = 0;
       }
       raf = requestAnimationFrame(tick);
     };
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, inView, tabVisible]);
+  }, [inView, tabVisible, reduced, paused, normalize]);
 
-  /* --- ホバー滞在。通り過ぎただけでは止めない。 --- */
+  /* --- hover: 通り過ぎただけでは止めない --- */
   const dwell = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearDwell = () => {
+    if (dwell.current) {
+      clearTimeout(dwell.current);
+      dwell.current = null;
+    }
+  };
   const onPointerEnter = useCallback(() => {
-    if (dwell.current) clearTimeout(dwell.current);
-    dwell.current = setTimeout(() => {
-      holding.current = true;
-      markInput();
-    }, HOVER_DWELL);
-  }, [markInput]);
+    clearDwell();
+    dwell.current = setTimeout(() => setBlocker("hovered", true), HOVER_DWELL);
+  }, [setBlocker]);
   const onPointerLeave = useCallback(() => {
-    if (dwell.current) clearTimeout(dwell.current);
-    holding.current = false;
-    markInput(); // 離れてから 2 秒後に再開
-  }, [markInput]);
+    clearDwell();
+    setBlocker("hovered", false);
+  }, [setBlocker]);
+  useEffect(() => clearDwell, []);
 
-  /* --- マウスのドラッグ。touch はブラウザ任せ（慣性を壊さない）。 --- */
-  const drag = useRef({ active: false, x: 0, left: 0, moved: 0 });
+  /* --- drag: 開始点からの正味移動量で判定する --- */
+  const drag = useRef({ id: -1, startX: 0, startLeft: 0, moved: false });
+
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      markInput();
-      holding.current = true;
-      if (e.pointerType !== "mouse") return;
-      const el = trackRef.current;
-      if (!el) return;
-      drag.current = { active: true, x: e.clientX, left: el.scrollLeft, moved: 0 };
+      const track = trackRef.current;
+      if (!track) return;
+      // touch はブラウザのネイティブスクロールに任せる（慣性を壊さない）
+      if (e.pointerType !== "mouse") {
+        setBlocker("dragging", true);
+        return;
+      }
+      drag.current = {
+        id: e.pointerId,
+        startX: e.clientX,
+        startLeft: pos.current,
+        moved: false,
+      };
       suppressClick.current = false;
+      setBlocker("dragging", true);
+      try {
+        track.setPointerCapture(e.pointerId);
+      } catch {
+        /* capture できなくても drag 自体は成立する */
+      }
     },
-    [markInput]
+    [setBlocker]
   );
+
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const d = drag.current;
-    if (!d.active) return;
-    const el = trackRef.current;
-    if (!el) return;
-    const dx = e.clientX - d.x;
-    d.moved += Math.abs(dx);
-    el.scrollLeft = d.left - dx;
-    if (d.moved > DRAG_SLOP) suppressClick.current = true;
+    if (d.id !== e.pointerId) return;
+    const track = trackRef.current;
+    if (!track) return;
+    // 累積ではなく開始点からの正味移動量。普通のクリックを drag と誤判定しない。
+    const dx = e.clientX - d.startX;
+    if (!d.moved && Math.abs(dx) > DRAG_THRESHOLD) {
+      d.moved = true;
+      suppressClick.current = true;
+    }
+    if (d.moved) {
+      pos.current = d.startLeft - dx;
+      track.scrollLeft = pos.current;
+    }
   }, []);
-  const endDrag = useCallback(() => {
-    drag.current.active = false;
-    holding.current = false;
-    markInput();
-    // クリック抑止は次のクリックを1回だけ潰す
-    setTimeout(() => {
-      suppressClick.current = false;
-    }, 0);
-  }, [markInput]);
 
-  /* --- trackpad / wheel。横方向の意図があるときだけ自動を止める。 --- */
-  const onWheel = useCallback(
-    (e: React.WheelEvent<HTMLDivElement>) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) markInput();
+  const endDrag = useCallback(
+    (e?: React.PointerEvent<HTMLDivElement>) => {
+      const track = trackRef.current;
+      if (track && e && track.hasPointerCapture?.(e.pointerId)) {
+        try {
+          track.releasePointerCapture(e.pointerId);
+        } catch {
+          /* 解放済みなら無視 */
+        }
+      }
+      drag.current.id = -1;
+      setBlocker("dragging", false);
+      // クリック抑止は次の click 1回だけ潰す
+      window.setTimeout(() => {
+        suppressClick.current = false;
+      }, 0);
     },
-    [markInput]
+    [setBlocker]
   );
 
-  /* --- キーボード --- */
+  /* --- focus: Rail 内にフォーカスがある間は絶対に再開しない --- */
+  const onFocusCapture = useCallback(
+    () => setBlocker("focused", true),
+    [setBlocker]
+  );
+  const onBlurCapture = useCallback(
+    (e: React.FocusEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+        setBlocker("focused", false);
+      }
+    },
+    [setBlocker]
+  );
+
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const el = trackRef.current;
-      if (!el) return;
+      const track = trackRef.current;
+      if (!track) return;
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       e.preventDefault();
-      markInput();
-      el.scrollBy({
-        left: e.key === "ArrowRight" ? 320 : -320,
-        behavior: reduced ? "auto" : "smooth",
-      });
+      pos.current += e.key === "ArrowRight" ? 320 : -320;
+      track.scrollLeft = pos.current;
+      normalize();
+      resumeAt.current = performance.now() + RESUME_DELAY;
+      rampStart.current = 0;
     },
-    [markInput, reduced]
+    [normalize]
   );
 
   const sets = Array.from({ length: SETS }, (_, i) => i);
+  const autoOn = !paused && !reduced;
 
   return (
     <div className="mt-20">
-      {/* 見出しはコンテナ内。レールだけ画面端まで抜けさせる。 */}
       <div className="mx-auto max-w-[1180px] px-6 md:px-10">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h3 className="text-[20px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[24px]">
-            ほかにつくったもの
-          </h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h3 className="text-[20px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[24px]">
+              ほかにつくったもの
+            </h3>
+            {/* 自動で動き続けるので、明示的に止められるようにする */}
+            <button
+              type="button"
+              onClick={() => setPaused((v) => !v)}
+              aria-pressed={paused}
+              aria-label={paused ? "自動スクロールを再生" : "自動スクロールを停止"}
+              title={paused ? "再生" : "停止"}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--v3-rule)] text-[10px] text-[var(--v3-fg-2)] transition-colors duration-200 hover:border-[var(--v3-accent)]/60 hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+            >
+              {paused ? <FaPlay /> : <FaPause />}
+            </button>
+          </div>
           <p className="text-[12px] text-[var(--v3-fg-2)]">
             {reduced
               ? "横にスクロールしてご覧ください"
-              : "ゆっくり流れています。触ると止まります"}
+              : paused
+                ? "停止中です"
+                : "ゆっくり流れています。触ると止まります"}
           </p>
         </div>
       </div>
@@ -419,19 +572,23 @@ export default function ProjectRail() {
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        onWheel={onWheel}
+        onLostPointerCapture={() => endDrag()}
+        onFocusCapture={onFocusCapture}
+        onBlurCapture={onBlurCapture}
         onKeyDown={onKeyDown}
-        onFocusCapture={markInput}
-        onScroll={normalize}
+        onScroll={onScroll}
         className="mt-7 overflow-x-auto overscroll-x-contain pt-2 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)] [&::-webkit-scrollbar]:hidden"
+        aria-live={autoOn ? "off" : "polite"}
       >
-        <ul className="flex w-max items-start gap-6 px-6 md:px-10">
+        <ul ref={listRef} className="flex w-max items-start gap-6 px-6 md:px-10">
           {sets.map((setIndex) =>
-            v3Rail.map((item) => (
+            v3Rail.map((item, i) => (
               <RailCard
                 key={`${setIndex}-${item.key}`}
                 item={item}
                 clone={setIndex !== 1}
+                setIndex={setIndex}
+                index={i}
                 suppressClick={suppressClick}
               />
             ))

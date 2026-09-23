@@ -48,7 +48,10 @@ const Contact = () => {
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
-          to_email: siteConfig.author.email,
+          // 宛先はソースへ書かない。env が無ければ送らない（テンプレート側で To を固定する想定）。
+          ...(process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL
+            ? { to_email: process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL }
+            : {}),
         },
         publicKey
       );

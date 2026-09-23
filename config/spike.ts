@@ -20,7 +20,6 @@ export const spikeProfile = {
   university: "武蔵野大学 データサイエンス学部",
   entranceYear: 2024,
   github: "https://github.com/namb0304",
-  email: "shunsukenamb0304@gmail.com",
   /** 仮コピー。職種ラベルは付けない。 */
   statement:
     "実装して終わりではなく、実際に導入され、使われ、運用されるところまで関わりたい。",
