@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/namboshunsuke/.claude/skills/ 2>/dev/null; echo \"---project---\"; ls /Users/namboshunsuke/my_projects/portfolio/.claude/skills/ 2>/dev/null)",
+      "Read(//Users/namboshunsuke/.claude/skills/**)",
+      "Bash(find /Users/namboshunsuke/.claude /Users/namboshunsuke/my_projects/portfolio/.claude -iname \"*ui-craft*\" -o -iname \"*uicraft*\" 2>/dev/null | head -20; echo \"--- plugins ---\"; ls /Users/namboshunsuke/.claude/plugins/ 2>/dev/null)",
+      "Read(//Users/namboshunsuke/.claude/**)",
+      "Read(//Users/namboshunsuke/.claude/plugins/**)"
+    ]
+  },
+  "enabledPlugins": {
+    "vercel@claude-plugins-official": true
+  }
+}

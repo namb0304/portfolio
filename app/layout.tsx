@@ -1,28 +1,25 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import GlobalHeader from "@/components/GlobalHeader";
-import Footer from "@/components/Footer";
+// Visual Spike 2026-09: サイト識別子を氏名にしたヘッダーへ差し替え。
+// 旧 GlobalHeader.tsx は削除せず残している。
+import SiteChrome from "@/components/SiteChrome";
 import ErrorBoundary from "@/components/ErrorBoundary";
-
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My Portfolio",
-  description: "南保俊輔についてのポートフォリオサイトです",
+  title: "南保 俊輔 — ポートフォリオ",
+  description:
+    "武蔵野大学 データサイエンス学部3年。飲食店向けモバイルオーダーSaaS「Hirolia」の開発と本番運用を担当しています。",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja" className="scroll-smooth">
-      <body className={`${inter.className} bg-gray-900 text-white`}>
+      <body className={`${inter.className} bg-ground text-ink antialiased`}>
         <ErrorBoundary>
-          <div className={`${inter.className} bg-gray-900 text-white`}>
-            <GlobalHeader />
-            <main>{children}</main>
-            <Footer />
-          </div>
+          <SiteChrome>{children}</SiteChrome>
         </ErrorBoundary>
       </body>
     </html>

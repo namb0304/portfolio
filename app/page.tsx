@@ -1,39 +1,41 @@
-import ProfileHeader from '@/components/ProfileHeader';
-import Skills from '@/components/Skills';
-import GitHubActivity from '@/components/GitHubActivity';
-import ProjectsSection from '@/components/ProjectsSection';
-import Timeline from '@/components/Timeline';
-import MotionWrap from '@/components/MotionWrap';
-import Contact from '@/components/Contact';
+/**
+ * Visual Spike 2026-09 — TOP。
+ * 情報の順番：何者か → 一番強い証拠 → その他の経験 → どう考えるようになったか → 技術的な裏付け。
+ * 旧構成は components/LegacyHome.tsx にそのまま残してある（戻す場合はそれを返す）。
+ */
+import Hero from "@/components/spike/Hero";
+import FeaturedHirolia from "@/components/spike/FeaturedHirolia";
+import SelectedWork from "@/components/spike/SelectedWork";
+import ThinkingSection from "@/components/spike/ThinkingSection";
+import TechnicalExperience from "@/components/spike/TechnicalExperience";
+import Milestones from "@/components/spike/Milestones";
+import SpikeGitHub from "@/components/spike/SpikeGitHub";
+import Contact from "@/components/Contact";
 
 export default function Home() {
   return (
-    <div className="pb-24">
-      {/* 1. プロフィール */}
-      <MotionWrap>
-        <ProfileHeader />
-      </MotionWrap>
+    <>
+      {/* 1. 何者か */}
+      <Hero />
 
-      {/* 2. スキル */}
-      <MotionWrap>
-        <Skills />
-      </MotionWrap>
+      {/* 2. 一番強い証拠 */}
+      <FeaturedHirolia />
 
-      {/* 4. プロジェクト */}
-      <MotionWrap>
-        <ProjectsSection />
-      </MotionWrap>
-      
-      {/* 5. タイムライン */}
-      <MotionWrap>
-        <Timeline />
-        <GitHubActivity />
-      </MotionWrap>
-      
-      {/* 6. コンタクト */}
-      <MotionWrap>
+      {/* 3. その他の経験 */}
+      <SelectedWork />
+
+      {/* 4. そこからどう考えるようになったか */}
+      <ThinkingSection />
+
+      {/* 5. 技術的な裏付け（主役にしない） */}
+      <TechnicalExperience />
+      <Milestones />
+      <SpikeGitHub />
+
+      {/* 6. 連絡先（既存フォームを流用） */}
+      <div className="border-t border-line">
         <Contact />
-      </MotionWrap>
-    </div>
+      </div>
+    </>
   );
 }
