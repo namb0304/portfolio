@@ -52,18 +52,37 @@ function Part({
   );
 }
 
-export default function HiroliaCaseStudy() {
+/**
+ * 戻り先は ?from で決める。referrer には依存しない（直リンク・リロードでも壊れないため）。
+ *   ?from=lab … Design Lab の Home v3 から開かれた → /design-lab#projects
+ *   それ以外   … 本番の TOP から開かれた         → /#projects
+ * 「トップへ戻る」だと戻り先が曖昧になるので、戻る先を文言に出す。
+ */
+function resolveBack(from?: string) {
+  return from === "lab"
+    ? { href: "/design-lab#projects", label: "Design Lab の Projects へ戻る" }
+    : { href: "/#projects", label: "Projects へ戻る" };
+}
+
+export default async function HiroliaCaseStudy({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const { from } = await searchParams;
+  const back = resolveBack(from);
+
   return (
     <article className="pb-24">
       {/* --- ページ冒頭 ------------------------------------------------- */}
       <header className="pt-12 pb-16 md:pt-16 md:pb-20">
         <Container>
           <Link
-            href="/#hirolia"
+            href={back.href}
             className="inline-flex items-center gap-2 rounded text-[13px] text-ink-3 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
             <FaArrowLeft size={11} />
-            トップへ戻る
+            {back.label}
           </Link>
 
           <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
@@ -306,11 +325,11 @@ export default function HiroliaCaseStudy() {
 
         <div className="mt-14 border-t border-line pt-10">
           <Link
-            href="/#work"
+            href={back.href}
             className="inline-flex items-center gap-2 rounded text-[14px] text-ink-2 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
             <FaArrowLeft size={11} />
-            トップの続きを読む
+            {back.label}
           </Link>
         </div>
       </Part>

@@ -7,89 +7,169 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons";
-import { FaArrowUpRightFromSquare, FaCloud, FaLightbulb } from "react-icons/fa6";
 import {
-  SiDocker,
-  SiExpo,
-  SiFastapi,
-  SiFirebase,
-  SiFlask,
-  SiGithubactions,
-  SiGoogleappsscript,
-  SiNextdotjs,
-  SiPhp,
-  SiPostgresql,
-  SiReact,
-  SiRender,
-  SiSentry,
-  SiTailwindcss,
-  SiTypescript,
-  SiVuedotjs,
-} from "react-icons/si";
+  FaArrowUpRightFromSquare,
+  FaChevronDown,
+  FaCloud,
+  FaLightbulb,
+} from "react-icons/fa6";
+import { TECH } from "./techIcons";
 import { v3Activities, v3Experience, v3Profile, v3Skills } from "@/config/v3";
 
-/**
- * Experience の visual hook。企業ロゴは出さない。
- * 「何の領域を経験したか」だけを小さな印で示す。
- */
-const EXP_MARK: Record<string, { Icon: IconType; label: string }> = {
-  STORES: { Icon: FaLightbulb, label: "product / thinking" },
-  マイナビ: { Icon: FaCloud, label: "cloud / infrastructure" },
-};
 
 /* ---------------------------------------------------------------- Experience */
 
+/**
+ * 参加形態を示す小さな印。企業ロゴは出さない。
+ * 主役は「何を経験したか」であって、どこに行ったかではない。
+ */
+const EXP_MARK: Record<string, { Icon: IconType; label: string }> = {
+  product: { Icon: FaLightbulb, label: "プロダクト開発" },
+  cloud: { Icon: FaCloud, label: "クラウド / インフラ" },
+};
+
+/** 取り組んだこと / 気づいたこと / 次に活かすこと の共通ブロック */
+function Block({
+  label,
+  lead,
+  points,
+  accent = false,
+}: {
+  label: string;
+  lead?: string;
+  points: readonly string[];
+  accent?: boolean;
+}) {
+  return (
+    <div>
+      <h4
+        className={`text-[12px] font-bold tracking-[0.04em] ${
+          accent ? "text-[var(--v3-accent)]" : "text-[var(--v3-fg-2)]"
+        }`}
+      >
+        {label}
+      </h4>
+      {lead && (
+        <p className="mt-2.5 text-[15px] leading-8 text-[var(--v3-fg)] [word-break:auto-phrase]">
+          {lead}
+        </p>
+      )}
+      <ul className="mt-2.5 space-y-2">
+        {points.map((p) => (
+          <li key={p} className="flex gap-3">
+            <span
+              aria-hidden="true"
+              className="mt-[13px] h-px w-3 shrink-0 bg-[var(--v3-rule)]"
+            />
+            <span className="text-[13px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
+              {p}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/**
+ * 1件ぶんの開閉。閉じているときは「どこで・いつ・何を学んだか」の3行だけ。
+ * 高さは grid-template-rows で変化させるので、開いた瞬間に飛ばない。
+ */
+function ExperienceItem({ e }: { e: (typeof v3Experience)[number] }) {
+  const [open, setOpen] = useState(false);
+  const mark = EXP_MARK[e.mark];
+  const panelId = `exp-panel-${e.key}`;
+  const btnId = `exp-btn-${e.key}`;
+
+  return (
+    <article className="border-b border-[var(--v3-rule)] last:border-b-0">
+      <h3>
+        <button
+          type="button"
+          id={btnId}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={() => setOpen((v) => !v)}
+          className="group flex w-full items-start gap-5 py-7 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)]"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="text-[19px] font-bold tracking-tight text-[var(--v3-fg)]">
+                {e.org}
+              </span>
+              <span className="text-[13px] text-[var(--v3-fg-2)]">
+                {e.program}
+              </span>
+            </span>
+            <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] tabular-nums text-[var(--v3-fg-2)]">
+              {e.format}
+              {mark && (
+                <span className="inline-flex items-center gap-1.5">
+                  <mark.Icon className="text-[11px]" aria-hidden="true" />
+                  {mark.label}
+                </span>
+              )}
+            </span>
+            <span className="mt-3 block max-w-[46rem] text-[14px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
+              {e.summary}
+            </span>
+          </span>
+
+          <span className="mt-1 flex shrink-0 items-center gap-2 text-[12px] text-[var(--v3-fg-2)] transition-colors duration-200 group-hover:text-[var(--v3-fg)]">
+            <span className="hidden sm:inline">{open ? "閉じる" : "詳しく見る"}</span>
+            <span
+              aria-hidden="true"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--v3-rule)] transition-[transform,border-color] duration-300 ease-out group-hover:border-[var(--v3-accent)]/60"
+              style={{ transform: open ? "rotate(180deg)" : "none" }}
+            >
+              <FaChevronDown className="text-[10px]" />
+            </span>
+          </span>
+        </button>
+      </h3>
+
+      {/* 0fr → 1fr。高さを直接指定しないので中身が変わっても破綻しない。 */}
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={btnId}
+        className={`grid transition-[grid-template-rows] duration-[320ms] ease-out ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-8 border-l border-[var(--v3-rule)] pb-9 pl-6 md:pl-8">
+            <Block label="取り組んだこと" lead={e.did.lead} points={e.did.points} />
+            <Block
+              label="気づいたこと"
+              lead={e.learned.lead}
+              points={e.learned.points}
+              accent
+            />
+            <Block label="次に活かすこと" points={e.next} />
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function Experience() {
   return (
-    <section
-      id="experience"
-      className="scroll-mt-20"
-    >
-      {/* Projects より幅を狭める。読ませる区画なので行長を詰める。 */}
-      <div className="mx-auto max-w-[920px] px-6 py-24 md:px-10 md:py-32">
-        <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
-          外に出て経験したこと
-        </h2>
+    <section id="experience" className="scroll-mt-24">
+      <div className="mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-32">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
+            インターン・参加プログラム
+          </h2>
+          <p className="text-[13px] text-[var(--v3-fg-2)]">
+            開くと、取り組んだこと・気づいたこと・次に活かすこと が読めます
+          </p>
+        </div>
 
-        <div className="mt-10 space-y-10">
+        <div className="mt-10 border-t border-[var(--v3-rule)]">
           {v3Experience.map((e) => (
-            <article
-              key={e.org}
-              className="group grid grid-cols-1 gap-x-10 gap-y-3 border-l-2 border-[var(--v3-rule)] pl-6 transition-colors duration-200 hover:border-[var(--v3-accent)] md:grid-cols-[220px_minmax(0,1fr)]"
-            >
-              <div>
-                <div className="flex items-center gap-2.5">
-                  {EXP_MARK[e.org] && (
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--v3-rule)] text-[12px] text-[var(--v3-fg-2)] transition-colors duration-200 group-hover:border-[var(--v3-accent)]/60 group-hover:text-[var(--v3-accent)]">
-                      {(() => {
-                        const M = EXP_MARK[e.org].Icon;
-                        return <M />;
-                      })()}
-                    </span>
-                  )}
-                  <h3 className="text-[17px] font-bold tracking-tight text-[var(--v3-fg)]">
-                    {e.org}
-                  </h3>
-                </div>
-                <p className="mt-2 text-[13px] leading-6 text-[var(--v3-fg-2)]">
-                  {e.role}
-                </p>
-                <p className="mt-1 text-[12px] tabular-nums text-[var(--v3-fg-2)]">
-                  {e.when}
-                  {"provisional" in e && e.provisional && (
-                    <span className="ml-2 text-[10px]">[時期 仮]</span>
-                  )}
-                </p>
-                {EXP_MARK[e.org] && (
-                  <p className="mt-2 text-[11px] tracking-[0.06em] text-[var(--v3-fg-2)]/70">
-                    {EXP_MARK[e.org].label}
-                  </p>
-                )}
-              </div>
-              <p className="text-[15px] leading-8 text-[var(--v3-fg-2)]">
-                {e.body}
-              </p>
-            </article>
+            <ExperienceItem key={e.key} e={e} />
           ))}
         </div>
       </div>
@@ -99,28 +179,11 @@ export function Experience() {
 
 /* ------------------------------------------------------------------- Skills */
 
-const ICONS: Record<string, { Icon: IconType; brand: string }> = {
-  flask: { Icon: SiFlask, brand: "#E8EDF3" },
-  postgres: { Icon: SiPostgresql, brand: "#5A9FD4" },
-  render: { Icon: SiRender, brand: "#B6C4D6" },
-  actions: { Icon: SiGithubactions, brand: "#5B8CE0" },
-  monitor: { Icon: SiSentry, brand: "#C98BB8" },
-  ts: { Icon: SiTypescript, brand: "#5A9FD4" },
-  react: { Icon: SiReact, brand: "#61DAFB" },
-  next: { Icon: SiNextdotjs, brand: "#E8EDF3" },
-  vue: { Icon: SiVuedotjs, brand: "#67C79B" },
-  firebase: { Icon: SiFirebase, brand: "#E0A93F" },
-  tailwind: { Icon: SiTailwindcss, brand: "#4FC3D9" },
-  fastapi: { Icon: SiFastapi, brand: "#4FAE8E" },
-  docker: { Icon: SiDocker, brand: "#5A9FD4" },
-  php: { Icon: SiPhp, brand: "#8C93C4" },
-  expo: { Icon: SiExpo, brand: "#E8EDF3" },
-  gas: { Icon: SiGoogleappsscript, brand: "#6FA8E0" },
-};
+const ICONS = TECH;
 
 export function Skills() {
   return (
-    <section id="skills" className="scroll-mt-20 bg-[var(--v3-surface)]/45">
+    <section id="skills" className="scroll-mt-24 bg-[var(--v3-surface)]/45">
       <div className="mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
@@ -150,7 +213,7 @@ export function Skills() {
                       key={it.name}
                       tabIndex={0}
                       style={{ "--brand": entry?.brand } as React.CSSProperties}
-                      className="group flex items-center gap-3.5 rounded-[7px] border border-transparent px-3 py-2.5 transition-[background-color,border-color] duration-200 hover:border-[var(--brand)]/35 hover:bg-[var(--v3-fg)]/[0.04] focus-visible:border-[var(--brand)]/35 focus-visible:bg-[var(--v3-fg)]/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+                      className="group flex items-center gap-3.5 rounded-[12px] border border-transparent px-3 py-2.5 transition-[background-color,border-color] duration-200 hover:border-[var(--brand)]/35 hover:bg-[var(--v3-fg)]/[0.04] focus-visible:border-[var(--brand)]/35 focus-visible:bg-[var(--v3-fg)]/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
                     >
                       {Icon && (
                         <span className="shrink-0 text-[20px] text-[var(--v3-fg-2)]">
@@ -204,7 +267,7 @@ export function Activities() {
   return (
     <section
       id="activities"
-      className="scroll-mt-20 bg-[var(--v3-navy)]/30"
+      className="scroll-mt-24 bg-[var(--v3-navy)]/30"
     >
       <div className="mx-auto max-w-[920px] px-6 py-24 md:px-10 md:py-32">
         <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
@@ -223,10 +286,10 @@ export function Activities() {
             >
               <div className="md:sticky md:top-24 md:self-start">
                 <p
-                  className={`text-[24px] font-bold tabular-nums leading-none transition-colors duration-300 ${
+                  className={`text-[28px] font-bold tabular-nums leading-none transition-colors duration-300 ${
                     activeYear === y.year
                       ? "text-[var(--v3-accent)]"
-                      : "text-[var(--v3-fg-2)]/55"
+                      : "text-[var(--v3-fg-2)]"
                   }`}
                 >
                   {y.year}
@@ -242,7 +305,7 @@ export function Activities() {
                   }}
                 />
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-3.5">
                 {y.items.map((it) => {
                   const current = "current" in it && it.current;
                   return (
@@ -256,15 +319,13 @@ export function Activities() {
                         }`}
                       />
                       <span
-                        className={`text-[14px] leading-7 ${
-                          current
-                            ? "text-[var(--v3-fg)]"
-                            : "text-[var(--v3-fg-2)]"
+                        className={`text-[15px] leading-8 [word-break:auto-phrase] ${
+                          current ? "text-[var(--v3-fg)]" : "text-[var(--v3-fg)]/85"
                         }`}
                       >
                         {it.text}
                         {"award" in it && it.award && (
-                          <span className="ml-2.5 rounded-[3px] border border-[var(--v3-accent)]/45 px-1.5 py-[1px] text-[10px] text-[var(--v3-accent)] transition-colors duration-200 hover:bg-[var(--v3-accent)]/12">
+                          <span className="ml-2.5 rounded-full border border-[var(--v3-accent)]/45 px-2 py-[2px] text-[11px] text-[var(--v3-accent)] transition-colors duration-200 hover:bg-[var(--v3-accent)]/12">
                             {it.award}
                           </span>
                         )}
@@ -294,7 +355,7 @@ export function GitHubActivity() {
   const chart = `https://ghchart.rshah.org/${username}?theme=onedark`;
 
   return (
-    <section id="github" className="scroll-mt-20">
+    <section id="github" className="scroll-mt-24">
       <div className="mx-auto max-w-[920px] px-6 py-16 md:px-10 md:py-20">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h2 className="text-[18px] font-bold tracking-tight text-[var(--v3-fg)]">
@@ -314,11 +375,11 @@ export function GitHubActivity() {
           href={v3Profile.github}
           target="_blank"
           rel="noopener noreferrer"
-          className="group mt-6 block rounded-[8px] border border-transparent p-3 transition-colors duration-200 hover:border-[var(--v3-rule)] hover:bg-[var(--v3-surface)]/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+          className="group mt-6 block rounded-[14px] border border-transparent p-3 transition-colors duration-200 hover:border-[var(--v3-rule)] hover:bg-[var(--v3-surface)]/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
         >
           {failed ? (
             // 外部サービスが落ちても「壊れている」ようには見せない
-            <div className="flex h-[112px] items-center justify-center rounded-[8px] border border-dashed border-[var(--v3-rule)] text-[12px] text-[var(--v3-fg-2)]">
+            <div className="flex h-[112px] items-center justify-center rounded-[14px] border border-dashed border-[var(--v3-rule)] text-[12px] text-[var(--v3-fg-2)]">
               コントリビューショングラフを読み込めませんでした
             </div>
           ) : (
@@ -348,14 +409,17 @@ export function Contact() {
   return (
     <section
       id="contact"
-      className="scroll-mt-20 bg-[var(--v3-surface)]/45"
+      className="scroll-mt-24 bg-[var(--v3-surface)]/45"
     >
-      <div className="mx-auto max-w-[920px] px-6 py-24 md:px-10 md:py-32">
+      {/* 見出し・本文・フォームを同じ幅の1列に揃える。
+          「中央寄せなのにフォームだけ左へ流れている」状態をなくす。 */}
+      <div className="mx-auto max-w-[620px] px-6 py-24 md:py-32">
         <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
-          連絡する
+          連絡先
         </h2>
-        <p className="mt-4 max-w-[34rem] text-[15px] leading-8 text-[var(--v3-fg-2)]">
-          採用・インターン・開発に関するご連絡はこちらからお願いします。
+        {/* 営業文句にしない。本人が普通に話している語り口に寄せる。 */}
+        <p className="mt-4 text-[15px] leading-8 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
+          採用・インターン・開発について、このサイトを見て気になったことがあればお聞かせください。
         </p>
 
         {/*
@@ -363,7 +427,7 @@ export function Contact() {
           個人のメールアドレスは画面にもHTMLにも、このページの client JS にも入れていない。
         */}
         <form
-          className="mt-10 max-w-[560px] space-y-5"
+          className="mt-10 space-y-6"
           onSubmit={(e) => e.preventDefault()}
         >
           {[
@@ -374,7 +438,7 @@ export function Contact() {
             <div key={f.id}>
               <label
                 htmlFor={f.id}
-                className="mb-2 block text-[13px] text-[var(--v3-fg-2)]"
+                className="mb-2 block text-[13px] font-medium text-[var(--v3-fg-2)]"
               >
                 {f.label}
                 {f.required && (
@@ -385,7 +449,7 @@ export function Contact() {
                 id={f.id}
                 type={f.type}
                 required={f.required}
-                className="w-full rounded-[6px] border border-[var(--v3-rule)] bg-[var(--v3-surface)] px-4 py-3 text-[15px] text-[var(--v3-fg)] transition-colors focus:border-[var(--v3-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+                className="w-full rounded-[12px] border border-[var(--v3-rule)] bg-[var(--v3-surface)] px-4 py-3 text-[15px] text-[var(--v3-fg)] transition-colors focus:border-[var(--v3-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
               />
             </div>
           ))}
@@ -393,7 +457,7 @@ export function Contact() {
           <div>
             <label
               htmlFor="v3-message"
-              className="mb-2 block text-[13px] text-[var(--v3-fg-2)]"
+              className="mb-2 block text-[13px] font-medium text-[var(--v3-fg-2)]"
             >
               メッセージ<span className="ml-1 text-[var(--v3-accent)]">*</span>
             </label>
@@ -401,13 +465,13 @@ export function Contact() {
               id="v3-message"
               rows={5}
               required
-              className="w-full resize-y rounded-[6px] border border-[var(--v3-rule)] bg-[var(--v3-surface)] px-4 py-3 text-[15px] leading-7 text-[var(--v3-fg)] transition-colors focus:border-[var(--v3-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+              className="w-full resize-y rounded-[12px] border border-[var(--v3-rule)] bg-[var(--v3-surface)] px-4 py-3 text-[15px] leading-7 text-[var(--v3-fg)] transition-colors focus:border-[var(--v3-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
             />
           </div>
 
           <button
             type="submit"
-            className="rounded-[4px] bg-[var(--v3-fg)] px-7 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+            className="rounded-[10px] bg-[var(--v3-fg)] px-7 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
           >
             送信する
           </button>

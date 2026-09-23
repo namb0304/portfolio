@@ -13,10 +13,9 @@ import DirectionB from "@/components/lab/DirectionB";
 import DirectionC from "@/components/lab/DirectionC";
 import HybridV2 from "@/components/lab/HybridV2";
 import HomeV3 from "@/components/lab/v3/HomeV3";
-import HomeV3Base from "@/components/lab/v3base/HomeV3";
 import { displayMincho, displaySerif } from "./fonts";
 
-type Key = "V3" | "V3B" | "H" | "A" | "B" | "C" | "all";
+type Key = "V3" | "H" | "A" | "B" | "C" | "all";
 
 const directions = [
   {
@@ -25,12 +24,6 @@ const directions = [
     keywords: "person first / portrait anchor / deep navy + cool blue / Home全体",
     thesis:
       "主語は Hirolia ではなく本人。旧Portfolioの良かった資産を戻し、2026年の人物像へ更新する。",
-  },
-  {
-    key: "V3B" as const,
-    name: "Home v3（polish前）",
-    keywords: "比較用に凍結した版。v3 の polish 前の見た目",
-    thesis: "polish の前後を見比べるために残している。コピーは共通の config を見ているため最新。",
   },
   {
     key: "H" as const,
@@ -65,12 +58,12 @@ const directions = [
 export default function DesignLab() {
   const [view, setView] = useState<Key>("V3");
 
-  const show = (k: "V3" | "V3B" | "H" | "A" | "B" | "C") => view === "all" || view === k;
+  const show = (k: "V3" | "H" | "A" | "B" | "C") => view === "all" || view === k;
 
   return (
     <div className="min-h-screen bg-[#0E1013]">
       {/* ===== Lab のツールバー。3案のどれとも違う見た目にして、評価を汚さない ===== */}
-      <div className="sticky top-0 z-50 border-b border-[#23272E] bg-[#0E1013]/95 backdrop-blur">
+      <div className="border-b border-[#23272E] bg-[#0E1013]">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-3 md:px-8">
           <div>
             <p className="text-[13px] font-semibold text-[#E6E8EB]">
@@ -89,7 +82,6 @@ export default function DesignLab() {
             {(
               [
                 ["V3", "Home v3"],
-                ["V3B", "v3 polish前"],
                 ["H", "Hybrid v2"],
                 ["A", "A — Editorial"],
                 ["B", "B — Interactive"],
@@ -136,7 +128,6 @@ export default function DesignLab() {
             </div>
 
             {d.key === "V3" && <HomeV3 />}
-            {d.key === "V3B" && <HomeV3Base />}
             {d.key === "H" && <HybridV2 minchoClass={displayMincho.className} />}
             {d.key === "A" && (
               <DirectionA serifClass={displaySerif.className} />

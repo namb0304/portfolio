@@ -29,6 +29,7 @@ import { academicStatus, v3Nav, v3Profile, v3Values } from "@/config/v3";
 
 export default function HomeV3() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("about");
   const [loaded, setLoaded] = useState(false);
   const reduced = usePrefersReducedMotion();
   const { grade, graduationYear } = academicStatus(v3Profile.entranceYear);
@@ -41,6 +42,30 @@ export default function HomeV3() {
 
   // ポートレート背後の光と、わずかな視差のためのポインタ座標
   const hero = usePointerLight<HTMLDivElement>();
+
+  /**
+   * いま読んでいるセクションを nav に出す。
+   * Design Lab のツールバーと混ざらないよう、サイト側の header をここで sticky にする。
+   * 目印は短い下線と文字色だけ。pill 型のナビにはしない。
+   */
+  useEffect(() => {
+    const ids = v3Nav.map((n) => n.href.replace("#", ""));
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (hit?.target.id) setActiveSection(hit.target.id);
+      },
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -55,8 +80,8 @@ export default function HomeV3() {
       className="bg-[var(--v3-bg)] text-[var(--v3-fg)]"
     >
       {/* ================= Header ======================================== */}
-      <header className="border-b border-[var(--v3-rule)] bg-[var(--v3-bg)]">
-        <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-6 px-6 py-4 md:px-10">
+      <header className="sticky top-0 z-30 border-b border-[var(--v3-rule)]/70 bg-[var(--v3-bg)]/92 backdrop-blur-md">
+        <div className="mx-auto flex h-[60px] max-w-[1180px] items-center justify-between gap-6 px-6 md:px-10">
           <a
             href="#about"
             className="flex items-baseline gap-3 rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)]"
@@ -71,16 +96,29 @@ export default function HomeV3() {
 
           <nav className="hidden lg:block" aria-label="メインナビゲーション">
             <ul className="flex items-center gap-7">
-              {v3Nav.map((n) => (
-                <li key={n.href}>
-                  <a
-                    href={n.href}
-                    className="rounded text-[13px] text-[var(--v3-fg-2)] transition-colors hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)]"
-                  >
-                    {n.label}
-                  </a>
-                </li>
-              ))}
+              {v3Nav.map((n) => {
+                const on = activeSection === n.href.replace("#", "");
+                return (
+                  <li key={n.href}>
+                    <a
+                      href={n.href}
+                      aria-current={on ? "true" : undefined}
+                      className={`relative rounded py-1 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)] ${
+                        on
+                          ? "text-[var(--v3-fg)]"
+                          : "text-[var(--v3-fg-2)] hover:text-[var(--v3-fg)]"
+                      }`}
+                    >
+                      {n.label}
+                      <span
+                        aria-hidden="true"
+                        className="absolute -bottom-0.5 left-0 h-px w-full origin-left bg-[var(--v3-accent)] transition-transform duration-300 ease-out"
+                        style={{ transform: on ? "scaleX(1)" : "scaleX(0)" }}
+                      />
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -125,7 +163,7 @@ export default function HomeV3() {
       {/* ================= Hero / Profile ================================ */}
       {/* visual anchor は本人。Hirolia の画像はここには置かない。
           顔は歪めない・回さない。奥行きは「層」と「光」だけで出す。 */}
-      <section id="about" className="scroll-mt-20">
+      <section id="about" className="scroll-mt-24">
         <div
           ref={hero.ref}
           onPointerMove={hero.onPointerMove}
@@ -166,7 +204,7 @@ export default function HomeV3() {
                   : undefined
               }
             />
-            <div className="relative overflow-hidden rounded-[10px] border border-[var(--v3-rule)]">
+            <div className="relative overflow-hidden rounded-[24px] ring-1 ring-[var(--v3-rule)]">
               <div className="relative aspect-[4/5]">
                 <Image
                   src={v3Profile.photo}
@@ -260,7 +298,7 @@ export default function HomeV3() {
             >
               <a
                 href="#projects"
-                className="group inline-flex items-center gap-2.5 rounded-[4px] bg-[var(--v3-fg)] px-6 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+                className="group inline-flex items-center gap-2.5 rounded-[10px] bg-[var(--v3-fg)] px-6 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
               >
                 つくったものを見る
                 <FaArrowRight
@@ -272,7 +310,7 @@ export default function HomeV3() {
                 href={v3Profile.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-[4px] border border-[var(--v3-rule)] px-6 py-3 text-[14px] text-[var(--v3-fg-2)] transition-colors duration-200 hover:border-[var(--v3-accent)]/60 hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+                className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--v3-rule)] px-6 py-3 text-[14px] text-[var(--v3-fg-2)] transition-colors duration-200 hover:border-[var(--v3-accent)]/60 hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
               >
                 <FaGithub size={15} />
                 GitHub
@@ -292,7 +330,11 @@ export default function HomeV3() {
 
           <div className="mt-8 grid grid-cols-1 gap-x-12 gap-y-9 md:grid-cols-3">
             {v3Values.map((v) => (
-              <div key={v.title} className="border-t-2 border-[var(--v3-accent)] pt-5">
+              <div key={v.title} className="relative pl-5">
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-1.5 h-[calc(100%-0.75rem)] w-[2px] rounded-full bg-[var(--v3-accent)]/70"
+                />
                 <h3 className="text-[17px] font-bold leading-snug tracking-tight md:text-[18px]">
                   {v.title}
                 </h3>
