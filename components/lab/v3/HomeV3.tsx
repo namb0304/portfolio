@@ -15,6 +15,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaArrowRight, FaBars, FaGithub, FaTimes } from "react-icons/fa";
+import Turn from "./Turn";
 import Work from "./Work";
 import { usePointerLight, usePrefersReducedMotion } from "./motion";
 import {
@@ -205,7 +206,11 @@ export default function HomeV3() {
             {v3Profile.statement}
           </p>
           <p className="mt-3.5 text-[13px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
-            {v3Profile.statementSub}
+            {v3Profile.statementSub.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </p>
 
           <p className="mt-5 flex items-start gap-2.5 border-l border-[var(--v3-rule)] pl-3.5 text-[13px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
@@ -342,10 +347,20 @@ export default function HomeV3() {
             </p>
 
             <p
-              className="mt-4 max-w-[33rem] text-[14px] leading-8 text-[var(--v3-fg-2)] [word-break:auto-phrase] transition-opacity duration-[600ms]"
+              /*
+                1行に必要なのは 14px で 627px。本文カラムは 1024px で 553px、
+                1280px 以上で 724px あるので、xl から 1 行に切り替える。
+                文字を小さくして押し込むことはしない。
+              */
+              className="mt-4 max-w-[30rem] text-[14px] leading-8 text-[var(--v3-fg-2)] [word-break:auto-phrase] transition-opacity duration-[600ms] xl:max-w-[41rem]"
               style={{ opacity: loaded ? 1 : 0, transitionDelay: "340ms" }}
             >
-              {v3Profile.statementSub}
+              {v3Profile.statementSub.map((line) => (
+                /* xl 未満は文ごとに改行、xl 以上は続けて 1 行 */
+                <span key={line} className="block xl:inline">
+                  {line}
+                </span>
+              ))}
             </p>
 
             <p
@@ -416,6 +431,8 @@ export default function HomeV3() {
 
       {/* ================= 以降は「裏づけ」 =============================== */}
       <Work />
+      {/* Projects → Internships の転換点。ここを通ってから次へ進む。 */}
+      <Turn />
       <Experience />
       <Skills />
       <Activities />

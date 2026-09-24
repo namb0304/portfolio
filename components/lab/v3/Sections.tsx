@@ -6,7 +6,7 @@
  */
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion } from "./motion";
+import { useFinePointer, useScrollProgress } from "./motion";
 import type { IconType } from "react-icons";
 import {
   FaArrowUpRightFromSquare,
@@ -31,23 +31,32 @@ const EXP_MARK: Record<string, { Icon: IconType; label: string }> = {
   cloud: { Icon: FaCloud, label: "クラウド / インフラ" },
 };
 
-/** 取り組んだこと / 気づいたこと / 次に活かすこと の共通ブロック */
+/**
+ * 取り組んだこと / 気づいたこと / 次に活かすこと の共通ブロック。
+ *
+ * active は「いまポインタ（またはフォーカス）がこのブロックにいる」状態。
+ * 変えるのは見出しの色だけにする。背景やカード枠を足すと、3 つの
+ * 意味の違いより「囲み」のほうが目立ってしまう。
+ */
 function Block({
   label,
   lead,
   points,
-  accent = false,
+  active = false,
+  headingId,
 }: {
   label: string;
   lead?: string;
   points: readonly string[];
-  accent?: boolean;
+  active?: boolean;
+  headingId?: string;
 }) {
   return (
     <div>
       <h4
-        className={`text-[12px] font-bold tracking-[0.04em] ${
-          accent ? "text-[var(--v3-accent)]" : "text-[var(--v3-fg-2)]"
+        id={headingId}
+        className={`text-[12px] font-bold tracking-[0.04em] transition-colors duration-200 ${
+          active ? "text-[var(--v3-accent)]" : "text-[var(--v3-fg-2)]"
         }`}
       >
         {label}
@@ -70,6 +79,146 @@ function Block({
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+/**
+ * 展開後の 3 ブロックに「いまどこを読んでいるか」を出す panel。
+ *
+ * 画面全体を追いかける cursor follower は作らない。あくまで panel の中だけで、
+ * 左の細い線の上を小さな marker が移動する **reading position indicator**。
+ * Activities の「点 → 線」と同じ言語を薄く反復するが、component は共有しない。
+ * 共有すると timeline に見えてしまい、思考の流れという意味が消えるため。
+ *
+ * touch / reduced-motion では marker を出さない。出さなくても
+ * 見出し・リード・箇条書きの階層だけで 3 つの違いは読める。
+ */
+function ReadingPanel({
+  e,
+  open,
+}: {
+  e: (typeof v3Experience)[number];
+  open: boolean;
+}) {
+  const fine = useFinePointer();
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const blockRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [active, setActive] = useState(-1);
+  const [marker, setMarker] = useState<{ top: number; h: number } | null>(null);
+
+  /** wrapper 上端を基準にした各ブロックの縦の範囲。hover に入った時だけ測る。 */
+  const bands = useRef<{ top: number; bottom: number }[]>([]);
+  const frame = useRef(0);
+
+  const readBands = () => {
+    const w = wrapRef.current;
+    if (!w) return;
+    const wt = w.getBoundingClientRect().top;
+    bands.current = blockRefs.current.map((el) => {
+      if (!el) return { top: 0, bottom: 0 };
+      const r = el.getBoundingClientRect();
+      return { top: r.top - wt, bottom: r.bottom - wt };
+    });
+  };
+
+  // 閉じたら状態を戻す。開いたままサイズが変わる場合に備えて測り直す。
+  useEffect(() => {
+    if (!open) {
+      setActive(-1);
+      setMarker(null);
+      return;
+    }
+    const id = window.setTimeout(readBands, 340); // 開くアニメの後で測る
+    return () => window.clearTimeout(id);
+  }, [open]);
+
+  // active が変わった時だけ marker の位置を出す。毎フレームは測らない。
+  useEffect(() => {
+    if (active < 0) {
+      setMarker(null);
+      return;
+    }
+    const el = blockRefs.current[active];
+    const w = wrapRef.current;
+    if (!el || !w) return;
+    setMarker({ top: el.offsetTop, h: el.offsetHeight });
+  }, [active]);
+
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
+  const onPointerMove = (ev: React.PointerEvent<HTMLDivElement>) => {
+    if (!fine || !open) return;
+    const y = ev.clientY;
+    if (frame.current) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = 0;
+      const w = wrapRef.current;
+      if (!w) return;
+      const local = y - w.getBoundingClientRect().top;
+      const hit = bands.current.findIndex(
+        (b) => local >= b.top && local <= b.bottom
+      );
+      // ブロックの隙間では切り替えない。これがそのまま threshold になる。
+      if (hit >= 0) setActive(hit);
+    });
+  };
+
+  const blocks = [
+    { label: "取り組んだこと", lead: e.did.lead, points: e.did.points },
+    { label: "気づいたこと", lead: e.learned.lead, points: e.learned.points },
+    { label: "次に活かすこと", points: e.next },
+  ] as const;
+
+  return (
+    <div
+      ref={wrapRef}
+      onPointerEnter={() => {
+        if (fine) readBands();
+      }}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => setActive(-1)}
+      className="relative space-y-8 border-l border-[var(--v3-rule)] pb-9 pl-6 md:pl-8"
+    >
+      {/* 線の上を動く marker。pointer / focus のある環境にだけ出す。 */}
+      {fine && (
+        <span
+          aria-hidden="true"
+          className="absolute -left-px w-[2px] rounded-full bg-[var(--v3-accent)] transition-[top,height,opacity] duration-[240ms] ease-out"
+          style={{
+            top: marker ? marker.top : 0,
+            height: marker ? marker.h : 0,
+            opacity: marker ? 0.9 : 0,
+          }}
+        />
+      )}
+
+      {blocks.map((b, i) => {
+        const headingId = `exp-${e.key}-h${i}`;
+        return (
+          <div
+            key={b.label}
+            ref={(el) => {
+              blockRefs.current[i] = el;
+            }}
+            /* キーボードでも同じ active を得られるようにする */
+            role="group"
+            tabIndex={open ? 0 : -1}
+            aria-labelledby={headingId}
+            onFocus={() => setActive(i)}
+            onBlur={() => setActive((v) => (v === i ? -1 : v))}
+            className="rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)]"
+          >
+            <Block
+              label={b.label}
+              lead={"lead" in b ? b.lead : undefined}
+              points={b.points}
+              active={active === i}
+              headingId={headingId}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -141,16 +290,7 @@ function ExperienceItem({ e }: { e: (typeof v3Experience)[number] }) {
         }`}
       >
         <div className="overflow-hidden">
-          <div className="space-y-8 border-l border-[var(--v3-rule)] pb-9 pl-6 md:pl-8">
-            <Block label="取り組んだこと" lead={e.did.lead} points={e.did.points} />
-            <Block
-              label="気づいたこと"
-              lead={e.learned.lead}
-              points={e.learned.points}
-              accent
-            />
-            <Block label="次に活かすこと" points={e.next} />
-          </div>
+          <ReadingPanel e={e} open={open} />
         </div>
       </div>
     </article>
@@ -160,7 +300,8 @@ function ExperienceItem({ e }: { e: (typeof v3Experience)[number] }) {
 export function Experience() {
   return (
     <section id="experience" className="scroll-mt-24">
-      <div className="mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
+      {/* 上は転換点セクションが「間」を持っているので、ここでは詰める */}
+      <div className="mx-auto max-w-[1080px] px-6 pt-14 pb-24 md:px-10 md:pt-16 md:pb-28">
         <SectionHead
           level="secondary"
           title="インターン・参加プログラム"
@@ -244,82 +385,45 @@ export function Skills() {
  * Activities — 「点と点を線でつなぐ」。
  *
  * 飾りの timeline ではなく、「この経験が次につながった」という本人の
- * 考え方そのものを形にする区画。各 milestone を node として扱い、
- * 通過した node は静かに残り、いま見ている node だけ accent になる。
+ * 考え方そのものを形にする区画。
  *
- * 実装: IntersectionObserver のみ。scroll listener も rAF も使わない。
- * reduced-motion では最初から全 node が完成状態。読み上げ内容は不変。
+ * 動きは scroll progress と同期させ、**可逆**にする。下へ進めば線が伸び、
+ * 上へ戻れば線も戻る。一度見たら固定される演出にしないのは、
+ * 過去と現在を自分で行き来できることに意味があるため。
+ *
+ * 実装: 進捗は --tp（0〜1）として section に書き、点と線の見た目は
+ * CSS の clamp/calc で --tp から導く。1 フレームごとの再描画は発生しない。
+ * 「いま何番目か」だけ state で持ち、値が変わった時だけ更新する。
  */
-function useSeenNodes(count: number) {
-  const [seen, setSeen] = useState<boolean[]>(() => Array(count).fill(false));
-  const refs = useRef<(HTMLLIElement | null)[]>([]);
-  const reduced = usePrefersReducedMotion();
 
-  useEffect(() => {
-    if (reduced) {
-      setSeen(Array(count).fill(true));
-      return;
-    }
-    const els = refs.current.filter(Boolean) as HTMLLIElement[];
-    if (!els.length || typeof IntersectionObserver === "undefined") {
-      setSeen(Array(count).fill(true));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        setSeen((prev) => {
-          const next = [...prev];
-          let changed = false;
-          for (const e of entries) {
-            if (!e.isIntersecting) continue;
-            const i = Number((e.target as HTMLElement).dataset.node);
-            // 一度通った点は消さない（過去は静かに残る）
-            if (!Number.isNaN(i) && !next[i]) {
-              next[i] = true;
-              changed = true;
-            }
-          }
-          return changed ? next : prev;
-        });
-      },
-      { rootMargin: "-20% 0px -35% 0px" }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [count, reduced]);
-
-  return { seen, refs, reduced };
-}
+/**
+ * 線が動く区間。進捗をそのまま点の数で等分する。
+ * こうしておくと「いま何番目か」（= floor(進捗 × 点の数)）と
+ * 線の先端が必ず一致し、年の強調と線がずれない。
+ */
+const TL_START = 0;
+const TL_END = 1;
 
 export function Activities() {
-  const [activeYear, setActiveYear] = useState<string | null>(null);
-  const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
   // 全 milestone を 1 本の連なりとして扱う
   const flat = v3Activities.flatMap((y) =>
     y.items.map((it) => ({ year: y.year, ...it }))
   );
-  const { seen, refs } = useSeenNodes(flat.length);
+  const total = flat.length;
+
+  const { ref, reduced, step } = useScrollProgress<HTMLDivElement>({
+    varName: "--tp",
+    steps: total,
+  });
+
+  /** 点 i が立ち上がり始める進捗 */
+  const band = (TL_END - TL_START) / total;
+  const startOf = (i: number) => TL_START + i * band;
+
+  // いま線の先端がいる年。scroll を戻せばこれも戻る。
+  const activeYear = flat[Math.min(step, total - 1)]?.year ?? null;
+
   let cursor = -1;
-
-  useEffect(() => {
-    const els = Object.entries(yearRefs.current).filter(([, el]) => el);
-    if (!els.length || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (hit) setActiveYear(hit.target.getAttribute("data-year"));
-      },
-      { rootMargin: "-35% 0px -45% 0px" }
-    );
-    els.forEach(([, el]) => io.observe(el!));
-    return () => io.disconnect();
-  }, []);
-
-  // いま「線が伸びている」先頭の node
-  const lastSeen = seen.lastIndexOf(true);
 
   return (
     <section id="activities" className="scroll-mt-24 bg-[var(--v3-navy)]/55">
@@ -330,14 +434,22 @@ export function Activities() {
           note="点がつながって、いまの考え方になった"
         />
 
-        <div className="space-y-10">
+        {/*
+          進捗はセクションではなく、この一覧そのものを基準に測る。
+          セクションには上下 144px の余白があり、そこまで含めて測ると
+          「最後の項目を読んでいるのに線がまだ届かない」ずれになる。
+          --tp はここに書き、点と線は子孫として受け取る。
+        */}
+        <div
+          ref={ref}
+          className="space-y-10"
+          /* JS が無い / まだ動いていない間は完成状態。情報が隠れないようにする。 */
+          style={{ "--tp": "1" } as React.CSSProperties}
+        >
           {v3Activities.map((y) => (
             <div
               key={y.year}
               data-year={y.year}
-              ref={(el) => {
-                yearRefs.current[y.year] = el;
-              }}
               className="grid grid-cols-1 gap-x-10 gap-y-4 md:grid-cols-[96px_minmax(0,1fr)]"
             >
               <div className="md:sticky md:top-24 md:self-start">
@@ -352,7 +464,7 @@ export function Activities() {
                 </p>
                 <span
                   aria-hidden="true"
-                  className="mt-3 block h-px w-10 origin-left bg-[var(--v3-accent)] transition-transform duration-[400ms] ease-out"
+                  className="mt-3 block h-px w-10 origin-left bg-[var(--v3-accent)] transition-[transform,opacity] duration-[400ms] ease-out"
                   style={{
                     transform:
                       activeYear === y.year ? "scaleX(1)" : "scaleX(0.15)",
@@ -361,7 +473,7 @@ export function Activities() {
                 />
               </div>
 
-              {/* 点を貫く 1 本の線。通過したぶんだけ下へ伸びる。 */}
+              {/* 点を貫く 1 本の線。進捗ぶんだけ下へ伸びる。 */}
               <ul className="relative space-y-3.5 pl-6">
                 <span
                   aria-hidden="true"
@@ -370,51 +482,54 @@ export function Activities() {
                 {y.items.map((it) => {
                   cursor += 1;
                   const i = cursor;
-                  const current = "current" in it && it.current;
-                  const lit = seen[i];
-                  const isHead = i === lastSeen && !current;
+                  const from = startOf(i);
+                  const isNow = "current" in it && it.current;
+                  const isHead = !reduced && i === step;
+
+                  /* この点のローカル進捗。線はゆっくり、点は少し早く立ち上がる。 */
+                  const seg = `clamp(0, calc((var(--tp) - ${from.toFixed(4)}) / ${band.toFixed(4)}), 1)`;
+                  const dot = `clamp(0, calc((var(--tp) - ${from.toFixed(4)}) / ${(band * 0.45).toFixed(4)}), 1)`;
+
                   return (
                     <li
                       key={it.text}
                       data-node={i}
-                      ref={(el) => {
-                        refs.current[i] = el;
-                      }}
                       className="relative flex items-baseline gap-3.5"
                     >
-                      {/* 線が次の点へ到達するまでの区間 */}
+                      {/* 次の点へ向かう区間。進捗に従って伸び、戻せば縮む。 */}
                       <span
                         aria-hidden="true"
-                        className="absolute -left-6 top-[10px] w-px origin-top bg-[var(--v3-accent)]/55 transition-transform duration-[520ms] ease-out"
+                        className="absolute -left-6 top-[10px] w-px origin-top bg-[var(--v3-accent)]/55"
                         style={{
                           height: "calc(100% + 0.875rem)",
-                          transform: lit ? "scaleY(1)" : "scaleY(0)",
+                          transform: `scaleY(${seg})`,
                         }}
                       />
+                      {/*
+                        点は 2 枚重ね。下が未通過の色、上が通過後の色で、
+                        上の不透明度だけを進捗で動かす。
+                        ring / glow は使わない。主役は点ではなく線なので、
+                        現在地は「わずかに大きい」だけで示す。
+                      */}
                       <span
                         aria-hidden="true"
-                        className="absolute -left-6 top-[7px] h-[7px] w-[7px] -translate-x-[2px] rounded-full transition-all duration-[420ms] ease-out"
-                        style={{
-                          background: current
-                            ? "var(--v3-accent)"
-                            : lit
-                              ? "var(--v3-fg-2)"
-                              : "var(--v3-rule)",
-                          boxShadow:
-                            current || isHead
-                              ? "0 0 0 4px color-mix(in srgb, var(--v3-accent) 14%, transparent)"
-                              : "none",
-                          transform: lit ? "scale(1)" : "scale(0.7)",
-                        }}
-                      />
+                        className="absolute -left-6 top-[7px] h-[7px] w-[7px] -translate-x-[2px] rounded-full bg-[var(--v3-rule)] transition-transform duration-[320ms] ease-out"
+                        style={{ transform: isHead ? "scale(1.3)" : "scale(1)" }}
+                      >
+                        <span
+                          className="block h-full w-full rounded-full"
+                          style={{
+                            opacity: dot,
+                            background: isNow
+                              ? "var(--v3-accent)"
+                              : "var(--v3-fg-2)",
+                          }}
+                        />
+                      </span>
                       <span
-                        className={`text-[15px] leading-8 [word-break:auto-phrase] transition-colors duration-[420ms] ${
-                          current
-                            ? "text-[var(--v3-fg)]"
-                            : lit
-                              ? "text-[var(--v3-fg)]/85"
-                              : "text-[var(--v3-fg)]/55"
-                        }`}
+                        className="text-[15px] leading-8 text-[var(--v3-fg)] [word-break:auto-phrase]"
+                        /* 通過前は沈ませ、通過後に読みやすい濃さへ戻す */
+                        style={{ opacity: `calc(0.5 + ${dot} * 0.5)` }}
                       >
                         {it.text}
                         {"award" in it && it.award && (

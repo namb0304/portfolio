@@ -130,7 +130,7 @@ export default function Work() {
 
   return (
     <section id="projects" className="scroll-mt-24">
-      <div className="mx-auto max-w-[1180px] px-6 pt-28 md:px-10 md:pt-40">
+      <div className="mx-auto max-w-[1180px] px-6 pt-24 md:px-10 md:pt-32">
         <SectionHead
           level="primary"
           title="つくったもの"
@@ -268,22 +268,12 @@ export default function Work() {
 
       </div>
 
-      {/* ===== Project Rail（画面端まで抜けさせる） =================== */}
-      <ProjectRail />
-
       {/*
-        Hirolia で視点が「作る」から「使われ続ける」へ変わったことが、
-        次の Internships へ進む前に一度だけ立ち上がるようにする。
-        新しいセクションは足さず、1行と余白だけで渡す。
+        ===== Project Rail（画面端まで抜けさせる） ===================
+        この下の「間」は Turn セクションが担うので、ここでは余白を作り込まない。
       */}
-      <div className="mx-auto max-w-[1180px] px-6 pt-24 pb-28 md:px-10 md:pt-32 md:pb-40">
-        <p className="max-w-[30rem] text-[19px] font-medium leading-[1.9] text-[var(--v3-fg)] [word-break:auto-phrase] md:text-[23px]">
-          「技術的に動くもの」と「現場で使われ続けるもの」は違う。
-        </p>
-        <p className="mt-4 max-w-[30rem] text-[14px] leading-8 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
-          店舗に入れてから知りました。ここから、外に出て学ぶことが増えました。
-        </p>
-      </div>
+      <ProjectRail />
+      <div className="h-4 md:h-6" />
     </section>
   );
 }
