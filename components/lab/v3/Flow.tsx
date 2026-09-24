@@ -24,16 +24,23 @@ const LINE_H =
 export default function Flow({
   nodes,
   accent = "var(--v3-accent)",
+  orientation = "responsive",
 }: {
   nodes: readonly Node[];
   accent?: string;
+  /** responsive: SPは縦・PCは横 / vertical: 常に縦（狭いカラム用） */
+  orientation?: "responsive" | "vertical";
 }) {
   const { ref, shown } = useRevealOnce<HTMLOListElement>();
 
   return (
     <ol
       ref={ref}
-      className="relative grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3 [--line-dir:linear-gradient(to_bottom,var(--v3-rule)_0%,var(--v3-rule)_72%,transparent_100%)] sm:[--line-dir:var(--line-h)]"
+      className={
+        orientation === "vertical"
+          ? "relative grid grid-cols-1 gap-y-5 [--line-dir:linear-gradient(to_bottom,var(--v3-rule)_0%,var(--v3-rule)_72%,transparent_100%)]"
+          : "relative grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3 [--line-dir:linear-gradient(to_bottom,var(--v3-rule)_0%,var(--v3-rule)_72%,transparent_100%)] sm:[--line-dir:var(--line-h)]"
+      }
       style={
         {
           "--flow-accent": accent,
@@ -44,7 +51,11 @@ export default function Flow({
       {/* 節をつなぐ線。SP では縦、PC では横に引かれる。 */}
       <span
         aria-hidden="true"
-        className="absolute left-[3px] top-2 bottom-2 w-px origin-top transition-transform duration-[600ms] ease-out sm:left-0 sm:right-0 sm:top-[3px] sm:bottom-auto sm:h-px sm:w-auto sm:origin-left"
+        className={`absolute left-[3px] top-2 bottom-2 w-px origin-top transition-transform duration-[600ms] ease-out ${
+          orientation === "vertical"
+            ? ""
+            : "sm:left-0 sm:right-0 sm:top-[3px] sm:bottom-auto sm:h-px sm:w-auto sm:origin-left"
+        }`}
         style={{
           transform: shown ? "scale(1)" : "scaleY(0)",
           transitionProperty: "transform",
@@ -54,11 +65,20 @@ export default function Flow({
       />
 
       {nodes.map((n, i) => (
-        <li key={n.step} className="relative pl-6 sm:pl-0 sm:pt-6">
+        <li
+          key={n.step}
+          className={
+            orientation === "vertical"
+              ? "relative pl-6"
+              : "relative pl-6 sm:pl-0 sm:pt-6"
+          }
+        >
           {/* 節。最後の節（結果）だけ塗りつぶして、流れの到達点を示す。 */}
           <span
             aria-hidden="true"
-            className="absolute left-0 top-[6px] h-[7px] w-[7px] rounded-[1px] transition-all duration-300 sm:top-0"
+            className={`absolute left-0 top-[6px] h-[7px] w-[7px] rounded-[1px] transition-all duration-300 ${
+              orientation === "vertical" ? "" : "sm:top-0"
+            }`}
             style={{
               background:
                 i === nodes.length - 1 ? "var(--flow-accent)" : "var(--v3-bg)",

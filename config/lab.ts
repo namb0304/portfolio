@@ -20,9 +20,9 @@ export const labHirolia = {
   name: "Hirolia",
   what: "飲食店向けモバイルオーダー",
   /** 「実際に使われている」の証拠 */
-  live: "5店舗で稼働中",
-  liveDetail: "本契約 4 / 試験導入 1（2026年9月時点）",
-  since: "2025年11月 —",
+  live: "本契約4店舗で運用中",
+  liveDetail: "本契約 4店舗（2026年9月時点）",
+  since: "2025年11月 企画・設計 / 12月 開発開始",
   team: "5人チーム / エンジニア2名",
   /** 「自分がどこまで関わっているか」 */
   scope: "注文画面・管理画面・API・DB設計から、本番の監視・CI・障害対応まで",
@@ -112,9 +112,9 @@ export const hybrid = {
 
   /** Hero 下端の反転バンド。Cの operation motif を「伝票」の質感で持つ。 */
   band: [
-    { label: "稼働", value: "5 STORES LIVE", live: true },
-    { label: "内訳", value: "本契約 4 / 試験導入 1" },
-    { label: "運用開始", value: "2025年11月" },
+    { label: "稼働", value: "4 STORES LIVE", live: true },
+    { label: "内訳", value: "すべて本契約" },
+    { label: "運用開始", value: "2026年4月" },
     { label: "本番", value: "Render・監視・CI・バックアップ" },
   ],
 

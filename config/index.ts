@@ -103,7 +103,8 @@ export const siteConfig = {
         category: "university",
         tags: ["Python", "Flask", "SQLite"],
         image: "/projects/project-mobaoru.png",
-        url: "https://gms.gdl.jp/s_yugo2/general/explamation",
+        // 公開URLは現在 HTTP 500 のため掲載しない
+        url: "なし",
         github: "https://github.com/namb0304/ds_hakka.git"
     },
     {

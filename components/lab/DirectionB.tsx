@@ -122,7 +122,7 @@ export default function DirectionB() {
 
             <p className="mt-6 max-w-[32rem] text-[14px] leading-7 text-[var(--lab-muted)]">
               飲食店向けモバイルオーダー「{labHirolia.name}」を5人チームで開発し、
-              実店舗5店舗で動かしています。下のスイッチは、同じビルドが置かれる2つの環境です。
+              本契約4店舗で動かしています。下のスイッチは、同じビルドが置かれる2つの環境です。
             </p>
 
             {/* --- signature interaction ------------------------------- */}

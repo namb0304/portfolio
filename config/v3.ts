@@ -32,9 +32,9 @@ export const v3Profile = {
   statement:
     "顧客の課題を理解し、「何をつくるか」から提案できるエンジニアを目指しています。",
   statementSub:
-    "そのために、要件・仕様の整理から実装、導入後の改善まで、一気通貫で関わる経験を重ねています。",
+    "そのために、事実を確かめて問題を切り分け、仮説を立てて確かめながら、最後まで動く形にすることを積み重ねています。",
   proof:
-    "現在は、飲食店向けモバイルオーダー「Hirolia」を実店舗5店舗で運用し、現場の声をもとに改善を続けています。",
+    "5人チームで開発している飲食店向けモバイルオーダー「Hirolia」で、注文画面・メニュー管理画面・APIの実装、DB設計、本番運用を担当しています。サービスは本契約4店舗で稼働中です。",
 } as const;
 
 /**
@@ -43,16 +43,16 @@ export const v3Profile = {
  */
 export const v3Values = [
   {
-    title: "ユーザー・顧客の課題から考える",
-    body: "仕様をそのまま実装するだけではなく、誰の何を変えるためのものなのかを理解してから作りたい。",
+    title: "誰が何に困っているのかを確かめる",
+    body: "その仕様が何のためにあるのかを開発者にも確認しながら作りたい。",
   },
   {
     title: "要件から運用改善まで関わる",
     body: "実装だけで区切らず、導入され、使われ、その後改善されるところまで関わりたい。",
   },
   {
-    title: "技術だけで閉じない",
-    body: "営業・事業・ユーザーなど、立場の異なる人と前提を揃えながら開発したい。",
+    title: "立場の異なる人と一緒に考える",
+    body: "Hirolia では営業メンバーを通じて店舗の反応が届く。技術の外にいる人とも前提を揃えられるようになりたい。",
   },
 ] as const;
 
@@ -74,15 +74,16 @@ export const v3Featured = {
   summary:
     "来店客が自分の端末から注文し、店舗は管理画面からメニューと店舗ごとの設定を管理します。",
   team: "5人チーム / エンジニア2名",
-  period: "2025年11月 —",
+  /** 「企画」は課題設定まで主導したように読めるので使わない。 */
+  period: "2025年11月 要件定義・設計 / 12月 実装開始",
   /**
    * Home に出すのはこの3点だけ。数字カードを並べた dashboard にはしない。
    * 長い担当一覧・技術一覧は /work/hirolia へ逃がす。
    */
   flow: [
     { step: "Problem", body: "注文対応が一部のスタッフへ集中していた" },
-    { step: "My Role", body: "顧客UI / 管理UI / API / DB / 運用" },
-    { step: "Current", body: "本契約4店舗 / 試験導入1店舗" },
+    { step: "My Role", body: "注文画面・メニュー管理画面・APIの実装、DB設計、本番運用" },
+    { step: "Current", body: "サービスは本契約4店舗で稼働中（2026年9月時点）" },
   ],
   /** Home では主要技術2〜3点まで */
   tech: ["flask", "postgres", "render"],
@@ -126,12 +127,24 @@ export const v3Rail = [
     key: "txc",
     name: "Thank x Chain",
     /** 誰向けの何か */
-    forWho: "感謝を伝えたい人のためのSNS",
+    forWho: "日常の小さな感謝を可視化し、次の行動につなげるSNS",
     accent: "#3AA6B9",
-    /** 作り直した経緯。受賞作としてではなく、やり直した話として見せる。 */
-    arc: ["Thanks をつくった", "狙った行動が起きなかった", "コンセプトから作り直した"],
+    /**
+     * 受賞したのは Thanks であって Thank x Chain ではない。
+     * 「Thank x Chain が奨励賞」と読める書き方をしないこと。
+     */
+    /**
+     * 再設計のきっかけは**チームでの振り返り**であって、
+     * ユーザー検証で「狙った行動が起きなかった」と確認したわけではない。
+     */
+    arc: [
+      "Thanks をつくった（RSS Hackathon 2025 Beyond 奨励賞）",
+      "チームで見直し、世界観とUI/UXに課題を感じた",
+      "コンセプトとUI/UXを再設計し Thank x Chain へ",
+    ],
     role: "フロントエンド / 企画",
-    result: "RSS Hackathon 2025 Beyond 奨励賞",
+    resultLabel: "参加",
+    result: "技育展2025 予選会",
     tech: ["vue", "firebase", "vercel"],
     image: "/projects/project-thanks_x_chain.png",
     imageFit: "cover",
@@ -143,7 +156,7 @@ export const v3Rail = [
     beforeLabel: "Thanks",
     afterLabel: "Thank x Chain",
     links: [
-      { label: "サービスを開く", href: "https://thanks.jkotqmrr.com/", kind: "external" },
+      { label: "見る", href: "https://thanks.jkotqmrr.com/", kind: "external" },
       { label: "GitHub", href: "https://github.com/namb0304/RSS_Hackathon_namelesz.git", kind: "github" },
     ],
   },
@@ -155,6 +168,7 @@ export const v3Rail = [
     summary:
       "自分でテーマを決め、路線を登録すると遅延情報が届くアプリとして制作。ポスター発表まで行いました。",
     role: "企画 / 実装 / 発表（個人開発）",
+    resultLabel: "受賞",
     result: "未来創造プロジェクト 学科賞",
     tech: ["react", "expo"],
     image: "/projects/project-future.png",
@@ -168,12 +182,16 @@ export const v3Rail = [
   },
   {
     key: "fashion",
-    name: "ファッション × SNS × AI",
-    forWho: "自分の服を記録して、コーディネートを共有したい人向け",
+    /** 正式名称は「AIによる画像分析とSNS機能を統合したファッション共有・提案システム」。
+     *  カード幅では可読性が落ちるため、title と説明に分けて意味は変えない。 */
+    name: "ファッション共有・提案システム",
+    forWho: "AIによる画像分析とSNS機能を統合。自分の服を登録して共有する",
     accent: "#7E82CF",
+    /** 担当はコミット履歴で確認済み。AI解析部分は別メンバーの担当なので書かない。 */
     summary:
-      "ゼミ合宿でのチーム開発。デジタルクローゼットとAIによるコーデ提案を組み合わせたサービスで、メイン機能の実装を担当しました。",
-    role: "メイン機能の実装",
+      "ゼミ合宿でのチーム開発。自分の服を登録し、SNSのように投稿・閲覧できる部分を担当しました。",
+    role: "クローゼット登録・投稿・マイページ・ログインまわりの実装",
+    resultLabel: "制作機会",
     result: "ゼミ合宿（2025年）",
     tech: ["php"],
     image: "/projects/project-ai-fashion.png",
@@ -181,6 +199,7 @@ export const v3Rail = [
     imageH: 190,
     width: 380,
     links: [
+      { label: "見る", href: "https://gms.gdl.jp/~nambo/sc2025-g3/general.html", kind: "external" },
       { label: "GitHub", href: "https://github.com/namb0304/sc2025-g3.git", kind: "github" },
     ],
   },
@@ -192,13 +211,20 @@ export const v3Rail = [
     summary:
       "お題は「一年に一度だけ使いたいもの」。七夕に合わせて、LINEで質問に答えると彦星の浮気度が分かるボットを作りました。",
     role: "実装（ハッカソン）",
+    resultLabel: "制作機会",
     result: "ツクってアソぶハッカソン",
     tech: ["gas"],
     image: "/projects/project-hikoboshi.png",
     imageFit: "cover",
     imageH: 200,
     width: 360,
-    links: [],
+    links: [
+      {
+        label: "見る",
+        href: "https://script.google.com/macros/s/AKfycbzj4qgiIhltVS79ln_qPxhknENe1KD3Qa7Va4XBj-HInQssBK40rMfbedFWtmEdNvw/exec",
+        kind: "external",
+      },
+    ],
   },
 ] as const;
 
@@ -220,21 +246,21 @@ export const v3Experience = [
     mark: "product",
     /** 閉じているときに出す一言 */
     summary:
-      "抽選販売機能の企画・実装を通じて、課題設定を判断基準として持ち続ける難しさを学びました。",
+      "抽選販売機能を企画・試作するなかで、課題設定を判断基準として持ち続ける難しさを知りました。",
     /** 何をやったか */
     did: {
-      lead: "STORES ネットショップ上で、外部サービスや手作業で行われている抽選販売を STORES 内で完結させる「抽選販売機能」を企画・開発しました。",
+      lead: "STORES ネットショップ上で、外部サービスや手作業で行われている抽選販売を STORES 内で完結させる「抽選販売機能」を企画し、プロトタイプを制作しました。",
       points: [
-        "商品設定 → 応募 → 抽選 → 結果確認 までの最低限のプロトタイプを作成",
+        "商品設定 → 応募 → 抽選 → 結果確認 までの最低限のプロトタイプを制作",
         "初期段階でターゲット / AS-IS・TO-BE / 情報の確度 / まだ分からないこと を整理",
         "データ設計・状態管理・二重実行対策・支払い方法・テスト・既存画面への組み込み",
       ],
     },
     /** 何が分かったか */
     learned: {
-      lead: "課題は最初に整理するだけでは足りず、開発・機能選定・検証・発表まで判断基準として持ち続ける必要がある、と分かりました。",
+      lead: "課題は最初に整理するだけでは足りず、開発・機能選定・検証・発表まで判断基準として持ち続ける必要がある、と感じました。",
       points: [
-        "実装に入ると、完成したかが分かりやすい作業（プロトタイプ・テスト・データ設計）へ意識が寄り、最初に置いた課題から判断が離れていった",
+        "実装が進むと、当初設定した課題よりも「完成させること」へ意識が寄っていた",
         "情報を集めることと、意思決定することは違う",
       ],
     },
@@ -254,18 +280,18 @@ export const v3Experience = [
     summary:
       "クラウド構成の構築と障害切り分けを通じて、システム全体を順に確認する考え方を学びました。",
     did: {
-      lead: "1日目は AWS の基礎をハンズオンで、2日目はチームでのトラブルシューティングに取り組みました。",
+      lead: "1日目は AWS の基礎をハンズオンで、2日目はチームで2つの構成のトラブルシューティングに取り組みました。",
       points: [
         "1日目: EC2 / VPC / Subnet / Security Group / IaC（AWS CDK）",
-        "2日目: CloudFront → API Gateway → Lambda の構成で、サイトが表示されない状態を切り分け",
-        "GET / POST の Method 不一致、CloudFront の Origin Path、ALB Listener、Target Group の Health Check、EC2 の Security Group を確認",
+        "2日目①: CloudFront → API Gateway → Lambda の構成で、サイトが表示されない状態を切り分け（Method 不一致 / Origin Path）",
+        "2日目②: CloudFront → ALB → Target Group → EC2 の構成を確認（Listener / Health Check / Security Group）",
       ],
     },
     learned: {
       lead: "コードを眺めて原因を探すのではなく、システムのどこまでが正常に動いているかを順番に切り分ける、という考え方が一番の収穫でした。",
       points: [
-        "Lambda 単体は正常 / API Gateway の POST は正常 / GET は失敗、という事実から Method 周辺へ原因候補を絞る進め方を経験した",
-        "クラウドエンジニアはコンソールを触る仕事ではなく、アプリを動かす土台を設計・構築・運用し、障害時に通信経路を切り分けて原因を特定する仕事だと理解が変わった",
+        "Lambda 単体は正常 / API Gateway の POST は正常 / GET は失敗、という事実から Method 周辺へ原因候補を絞った",
+        "どこまでが正常かを順に確かめると、原因の範囲が機械的に狭まっていくと分かった",
       ],
     },
     next: [
@@ -284,7 +310,7 @@ export const v3Experience = [
 export const v3Skills = [
   {
     group: "Production",
-    note: "実店舗で稼働しているプロダクトで使用・運用",
+    note: "Hirolia の実運用で使っているもの",
     items: [
       { name: "Python / Flask", icon: "flask", where: "Hirolia Backend API" },
       { name: "PostgreSQL", icon: "postgres", where: "Hirolia 本番DB / pg_dump で外部バックアップ" },
@@ -296,7 +322,7 @@ export const v3Skills = [
   },
   {
     group: "Main Development",
-    note: "チーム開発・個人開発で主に使うもの",
+    note: "制作で主に使うもの",
     items: [
       { name: "TypeScript", icon: "ts", where: "このポートフォリオ" },
       { name: "React", icon: "react", where: "個人開発・学内制作" },
@@ -308,7 +334,7 @@ export const v3Skills = [
   },
   {
     group: "Other Experience",
-    note: "学習・試作の範囲で触れたもの",
+    note: "制作や学習で使ったもの",
     items: [
       { name: "FastAPI", icon: "fastapi", where: "個人開発" },
       { name: "Docker", icon: "docker", where: "ローカル環境構築" },
@@ -328,26 +354,30 @@ export const v3Activities = [
     year: "2024",
     items: [
       { text: "武蔵野大学 データサイエンス学部に入学し、Web開発を始める" },
-      { text: "Progate Hackathon powered by AWS", award: "企業賞" },
+      {
+        text: "Progate Hackathon powered by AWS にチームで参加",
+        award: "AppBrew賞（企業賞）",
+      },
     ],
   },
   {
     year: "2025",
     items: [
       { text: "未来創造プロジェクト / 電車遅延情報アプリ", award: "学科賞" },
-      { text: "Thanks を制作", award: "奨励賞" },
-      { text: "コンセプトを見直し Thank x Chain として作り直す" },
-      { text: "Hirolia の開発を開始" },
+      { text: "Thanks を制作", award: "RSS Hackathon 2025 Beyond 奨励賞" },
+      { text: "コンセプトを再設計し Thank x Chain へ。技育展2025 予選会に参加" },
+      { text: "11月 Hirolia の要件定義・設計を開始" },
+      { text: "12月 ハッカソンに合わせて Hirolia の実装を開始" },
     ],
   },
   {
     year: "2026",
     items: [
-      { text: "Hirolia を実店舗へ導入", provisional: true },
-      { text: "有料契約へ移行し、監視・CI・バックアップを整備", provisional: true },
-      { text: "STORES プロダクト開発インターン" },
-      { text: "マイナビ クラウドエンジニア体験プログラム（9月）" },
-      { text: "本契約4店舗 / 試験導入1店舗で継続運用", current: true },
+      { text: "4月 Hirolia を1店舗目へ試験導入" },
+      { text: "7月 1店舗目が正式な有料契約へ移行" },
+      { text: "8月 STORES プロダクト開発インターン" },
+      { text: "9月 マイナビ クラウドエンジニア体験プログラム" },
+      { text: "9月 Hirolia を本契約4店舗で運用中", current: true },
     ],
   },
 ] as const;

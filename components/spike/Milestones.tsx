@@ -20,7 +20,6 @@ export default function Milestones() {
         />
         {milestones.map((m) => {
           const current = "current" in m && m.current;
-          const provisional = "provisional" in m && m.provisional;
           return (
             <li
               key={m.date + m.title}
@@ -45,11 +44,6 @@ export default function Milestones() {
                 }`}
               >
                 {m.title}
-                {provisional && (
-                  <span className="ml-2 align-middle font-mono text-[10px] uppercase tracking-wider text-ink-3">
-                    [日付 仮]
-                  </span>
-                )}
               </p>
             </li>
           );

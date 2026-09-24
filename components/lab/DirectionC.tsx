@@ -6,7 +6,7 @@
  * 固有の判断:
  *  - **3案で唯一ライト基調にした。** 前回の反省「全セクションが同じ黒背景」に対する直接の答えであり、
  *    3案を並べたときの比較軸としても効く。ダーク＝技術者という短絡も避けられる。
- *  - signature は最上部の status strip。`5 STORES LIVE` は本人にしか書けない一行で、
+ *  - signature は最上部の status strip。`4 STORES LIVE` は本人にしか書けない一行で、
  *    同時に「この人は運用している側だ」を1秒で伝える。
  *  - 密度を上げる代わりに、罫線と tabular-nums で**記録らしさ**を出す。
  *    ただし数値カードを並べたダッシュボードにはしない。主役は文章と製品画像のまま。
@@ -55,8 +55,8 @@ export default function DirectionC() {
             </span>
             PRODUCTION
           </span>
-          <span className="tabular-nums">5 STORES LIVE</span>
-          <span className="text-[#F6F5F2]/55">本契約 4 / 試験導入 1</span>
+          <span className="tabular-nums">4 STORES LIVE</span>
+          <span className="text-[#F6F5F2]/55">すべて本契約</span>
           <span className="ml-auto tabular-nums text-[#F6F5F2]/55">
             2026-09
           </span>
@@ -102,7 +102,7 @@ export default function DirectionC() {
             </h1>
             <p className="mt-5 max-w-[34rem] text-[14px] leading-7 text-[var(--lab-muted)]">
               飲食店向けモバイルオーダー「{labHirolia.name}」を5人チームのエンジニア2名のうち1人として開発し、
-              実店舗5店舗の本番環境を運用しています。
+              本契約4店舗の本番環境を運用しています。
             </p>
 
             {/* 仕様書のような密度。ここが Direction C の情報密度の主張 */}

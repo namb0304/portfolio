@@ -3,14 +3,14 @@
 /**
  * お問い合わせフォームの送信ロジック。
  *
- * 宛先の扱い（重要）:
- *   個人のメールアドレスをソースコードへ書かない。
- *   `NEXT_PUBLIC_EMAILJS_TO_EMAIL` が設定されていればテンプレートへ渡し、
- *   **未設定なら `to_email` を送らない**。
+ * 宛先:
+ *   EmailJS テンプレート側で To Email を固定済みのため、フロントからは
+ *   `to_email` を一切渡さない。個人アドレスがクライアントバンドルへ入る経路を
+ *   コードから完全になくすため、env 経由の fallback も持たない。
  *
- *   EmailJS のテンプレート側で To を固定アドレスにすれば、この env を消すだけで
- *   クライアントバンドルからアドレスが完全に消える（コード変更は不要）。
- *   逆にテンプレートが {{to_email}} のままでも、env がある限り送信は壊れない。
+ * 自動返信:
+ *   初回公開では送らない。本人宛て通知が成功したのに自動返信だけ失敗すると
+ *   フォーム全体が失敗表示になり、利用者が再送して二重問い合わせになるため。
  */
 import { useCallback, useState } from "react";
 import emailjs from "@emailjs/browser";
@@ -67,9 +67,7 @@ export function useContactForm() {
 
       const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
       const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-      const autoReplyId = process.env.NEXT_PUBLIC_EMAILJS_AUTO_REPLY_TEMPLATE_ID;
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-      const toEmail = process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL;
 
       if (!serviceId || !templateId || !publicKey) {
         // 設定不足は開発側の問題。利用者には内部事情を見せない。
@@ -84,28 +82,18 @@ export function useContactForm() {
           serviceId,
           templateId,
           {
+            // テンプレートが {{name}}/{{email}} と {{from_name}}/{{from_email}} を
+            // 併用しているため、両方の名前で同じ値を渡して取りこぼしを防ぐ。
+            name: values.name,
+            email: values.email,
             from_name: values.name,
             from_email: values.email,
             subject: values.subject,
             message: values.message,
-            // テンプレート側で To を固定したら、この env を消すだけでよい
-            ...(toEmail ? { to_email: toEmail } : {}),
           },
           publicKey
         );
 
-        if (autoReplyId) {
-          await emailjs.send(
-            serviceId,
-            autoReplyId,
-            {
-              from_name: values.name,
-              from_email: values.email,
-              message: values.message,
-            },
-            publicKey
-          );
-        }
 
         setStatus("success");
         setValues(EMPTY); // 成功時だけ消す

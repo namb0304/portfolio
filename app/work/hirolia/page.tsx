@@ -12,7 +12,7 @@ import { hirolia } from "@/config/spike";
 export const metadata: Metadata = {
   title: "Hirolia — 飲食店向けモバイルオーダーSaaS ｜ 南保 俊輔",
   description:
-    "実店舗へ導入したあとに出た問題と、その改善。開発から運用までの担当範囲についてのケーススタディ（内容は暫定）。",
+    "実店舗へ導入したあとに出た問題と、その改善。開発から運用までの担当範囲についてのケーススタディ。",
 };
 
 const toc = [

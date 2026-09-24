@@ -6,6 +6,7 @@
  */
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "./motion";
 import type { IconType } from "react-icons";
 import {
   FaArrowUpRightFromSquare,
@@ -13,6 +14,7 @@ import {
   FaCloud,
   FaLightbulb,
 } from "react-icons/fa6";
+import SectionHead from "./SectionHead";
 import { TECH } from "./techIcons";
 import { useContactForm } from "@/hooks/useContactForm";
 import { v3Activities, v3Experience, v3Profile, v3Skills } from "@/config/v3";
@@ -158,17 +160,14 @@ function ExperienceItem({ e }: { e: (typeof v3Experience)[number] }) {
 export function Experience() {
   return (
     <section id="experience" className="scroll-mt-24">
-      <div className="mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-32">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
-            インターン・参加プログラム
-          </h2>
-          <p className="text-[13px] text-[var(--v3-fg-2)]">
-            開くと、取り組んだこと・気づいたこと・次に活かすこと が読めます
-          </p>
-        </div>
+      <div className="mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
+        <SectionHead
+          level="secondary"
+          title="インターン・参加プログラム"
+          note="開くと、取り組んだこと・気づいたこと・次に活かすこと が読めます"
+        />
 
-        <div className="mt-10 border-t border-[var(--v3-rule)]">
+        <div className="border-t border-[var(--v3-rule)]">
           {v3Experience.map((e) => (
             <ExperienceItem key={e.key} e={e} />
           ))}
@@ -184,18 +183,15 @@ const ICONS = TECH;
 
 export function Skills() {
   return (
-    <section id="skills" className="scroll-mt-24 bg-[var(--v3-surface)]/45">
-      <div className="mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
-            使っている技術
-          </h2>
-          <p className="text-[13px] text-[var(--v3-fg-2)]">
-            本番で動かしているものと、そうでないものを分けています
-          </p>
-        </div>
+    <section id="skills" className="scroll-mt-24 bg-[var(--v3-surface)]/80">
+      <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
+        <SectionHead
+          level="tertiary"
+          title="使っている技術"
+          note="Hirolia の実運用で使う技術と、その他の制作・学習で使った技術"
+        />
 
-        <div className="mt-12 space-y-12">
+        <div className="space-y-12">
           {v3Skills.map((g) => (
             <div key={g.group}>
               <div className="flex flex-col gap-1 border-b border-[var(--v3-rule)] pb-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
@@ -244,11 +240,68 @@ export function Skills() {
 
 /* --------------------------------------------------------------- Activities */
 
+/**
+ * Activities — 「点と点を線でつなぐ」。
+ *
+ * 飾りの timeline ではなく、「この経験が次につながった」という本人の
+ * 考え方そのものを形にする区画。各 milestone を node として扱い、
+ * 通過した node は静かに残り、いま見ている node だけ accent になる。
+ *
+ * 実装: IntersectionObserver のみ。scroll listener も rAF も使わない。
+ * reduced-motion では最初から全 node が完成状態。読み上げ内容は不変。
+ */
+function useSeenNodes(count: number) {
+  const [seen, setSeen] = useState<boolean[]>(() => Array(count).fill(false));
+  const refs = useRef<(HTMLLIElement | null)[]>([]);
+  const reduced = usePrefersReducedMotion();
+
+  useEffect(() => {
+    if (reduced) {
+      setSeen(Array(count).fill(true));
+      return;
+    }
+    const els = refs.current.filter(Boolean) as HTMLLIElement[];
+    if (!els.length || typeof IntersectionObserver === "undefined") {
+      setSeen(Array(count).fill(true));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        setSeen((prev) => {
+          const next = [...prev];
+          let changed = false;
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            const i = Number((e.target as HTMLElement).dataset.node);
+            // 一度通った点は消さない（過去は静かに残る）
+            if (!Number.isNaN(i) && !next[i]) {
+              next[i] = true;
+              changed = true;
+            }
+          }
+          return changed ? next : prev;
+        });
+      },
+      { rootMargin: "-20% 0px -35% 0px" }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [count, reduced]);
+
+  return { seen, refs, reduced };
+}
+
 export function Activities() {
   const [activeYear, setActiveYear] = useState<string | null>(null);
   const yearRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // 見ている年の marker だけ明るくする。要素は動かさないので読みづらくならない。
+  // 全 milestone を 1 本の連なりとして扱う
+  const flat = v3Activities.flatMap((y) =>
+    y.items.map((it) => ({ year: y.year, ...it }))
+  );
+  const { seen, refs } = useSeenNodes(flat.length);
+  let cursor = -1;
+
   useEffect(() => {
     const els = Object.entries(yearRefs.current).filter(([, el]) => el);
     if (!els.length || typeof IntersectionObserver === "undefined") return;
@@ -265,17 +318,19 @@ export function Activities() {
     return () => io.disconnect();
   }, []);
 
-  return (
-    <section
-      id="activities"
-      className="scroll-mt-24 bg-[var(--v3-navy)]/30"
-    >
-      <div className="mx-auto max-w-[920px] px-6 py-24 md:px-10 md:py-32">
-        <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
-          これまで
-        </h2>
+  // いま「線が伸びている」先頭の node
+  const lastSeen = seen.lastIndexOf(true);
 
-        <div className="mt-10 space-y-10">
+  return (
+    <section id="activities" className="scroll-mt-24 bg-[var(--v3-navy)]/55">
+      <div className="mx-auto max-w-[920px] px-6 py-28 md:px-10 md:py-36">
+        <SectionHead
+          level="secondary"
+          title="これまで"
+          note="点がつながって、いまの考え方になった"
+        />
+
+        <div className="space-y-10">
           {v3Activities.map((y) => (
             <div
               key={y.year}
@@ -295,7 +350,6 @@ export function Activities() {
                 >
                   {y.year}
                 </p>
-                {/* 年の下の短い線。見ている年だけ伸びる。 */}
                 <span
                   aria-hidden="true"
                   className="mt-3 block h-px w-10 origin-left bg-[var(--v3-accent)] transition-transform duration-[400ms] ease-out"
@@ -306,33 +360,66 @@ export function Activities() {
                   }}
                 />
               </div>
-              <ul className="space-y-3.5">
+
+              {/* 点を貫く 1 本の線。通過したぶんだけ下へ伸びる。 */}
+              <ul className="relative space-y-3.5 pl-6">
+                <span
+                  aria-hidden="true"
+                  className="absolute left-[3px] top-2 bottom-2 w-px bg-[var(--v3-rule)]"
+                />
                 {y.items.map((it) => {
+                  cursor += 1;
+                  const i = cursor;
                   const current = "current" in it && it.current;
+                  const lit = seen[i];
+                  const isHead = i === lastSeen && !current;
                   return (
-                    <li key={it.text} className="flex items-baseline gap-3.5">
+                    <li
+                      key={it.text}
+                      data-node={i}
+                      ref={(el) => {
+                        refs.current[i] = el;
+                      }}
+                      className="relative flex items-baseline gap-3.5"
+                    >
+                      {/* 線が次の点へ到達するまでの区間 */}
                       <span
                         aria-hidden="true"
-                        className={`mt-[7px] h-[6px] w-[6px] shrink-0 rounded-full ${
-                          current
-                            ? "bg-[var(--v3-accent)]"
-                            : "bg-[var(--v3-rule)]"
-                        }`}
+                        className="absolute -left-6 top-[10px] w-px origin-top bg-[var(--v3-accent)]/55 transition-transform duration-[520ms] ease-out"
+                        style={{
+                          height: "calc(100% + 0.875rem)",
+                          transform: lit ? "scaleY(1)" : "scaleY(0)",
+                        }}
                       />
                       <span
-                        className={`text-[15px] leading-8 [word-break:auto-phrase] ${
-                          current ? "text-[var(--v3-fg)]" : "text-[var(--v3-fg)]/85"
+                        aria-hidden="true"
+                        className="absolute -left-6 top-[7px] h-[7px] w-[7px] -translate-x-[2px] rounded-full transition-all duration-[420ms] ease-out"
+                        style={{
+                          background: current
+                            ? "var(--v3-accent)"
+                            : lit
+                              ? "var(--v3-fg-2)"
+                              : "var(--v3-rule)",
+                          boxShadow:
+                            current || isHead
+                              ? "0 0 0 4px color-mix(in srgb, var(--v3-accent) 14%, transparent)"
+                              : "none",
+                          transform: lit ? "scale(1)" : "scale(0.7)",
+                        }}
+                      />
+                      <span
+                        className={`text-[15px] leading-8 [word-break:auto-phrase] transition-colors duration-[420ms] ${
+                          current
+                            ? "text-[var(--v3-fg)]"
+                            : lit
+                              ? "text-[var(--v3-fg)]/85"
+                              : "text-[var(--v3-fg)]/55"
                         }`}
                       >
                         {it.text}
                         {"award" in it && it.award && (
                           <span className="ml-2.5 rounded-full border border-[var(--v3-accent)]/45 px-2 py-[2px] text-[11px] text-[var(--v3-accent)] transition-colors duration-200 hover:bg-[var(--v3-accent)]/12">
                             {it.award}
-                          </span>
-                        )}
-                        {"provisional" in it && it.provisional && (
-                          <span className="ml-2 text-[10px] text-[var(--v3-fg-2)]/70">
-                            [時期 仮]
                           </span>
                         )}
                       </span>
@@ -357,7 +444,7 @@ export function GitHubActivity() {
 
   return (
     <section id="github" className="scroll-mt-24">
-      <div className="mx-auto max-w-[920px] px-6 py-16 md:px-10 md:py-20">
+      <div className="mx-auto max-w-[920px] px-6 py-14 md:px-10 md:py-16">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h2 className="text-[18px] font-bold tracking-tight text-[var(--v3-fg)]">
             GitHub
@@ -419,8 +506,8 @@ export function Contact() {
   return (
     <section id="contact" className="scroll-mt-24 bg-[var(--v3-surface)]/45">
       {/* 見出し・本文・フォームを同じ幅の1列に揃える。 */}
-      <div className="mx-auto max-w-[620px] px-6 py-24 md:py-32">
-        <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
+      <div className="mx-auto max-w-[620px] px-6 py-20 md:py-24">
+        <h2 className="text-[18px] font-bold leading-[1.4] tracking-tight text-[var(--v3-fg)] md:text-[21px]">
           連絡先
         </h2>
         {/* 営業文句にしない。本人が普通に話している語り口に寄せる。 */}

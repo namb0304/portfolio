@@ -29,7 +29,6 @@ const Contact = () => {
       // EmailJSの設定（環境変数から取得）
       const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
       const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-      const autoReplyTemplateId = process.env.NEXT_PUBLIC_EMAILJS_AUTO_REPLY_TEMPLATE_ID;
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
       // 環境変数が設定されていない場合のエラーハンドリング
@@ -39,36 +38,23 @@ const Contact = () => {
         return;
       }
 
-      // 1通目: 自分宛にお問い合わせ内容を送信
+      // 本人宛ての通知メール（初回公開では自動返信は送らない）
       await emailjs.send(
         serviceId,
         templateId,
         {
+          // To はテンプレート側で固定済み。フロントからは宛先を渡さない。
+          // テンプレートが {{name}}/{{email}} と {{from_name}}/{{from_email}} を
+          // 併用しているため、両方の名前で同じ値を渡す。
+          name: formData.name,
+          email: formData.email,
           from_name: formData.name,
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
-          // 宛先はソースへ書かない。env が無ければ送らない（テンプレート側で To を固定する想定）。
-          ...(process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL
-            ? { to_email: process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL }
-            : {}),
         },
         publicKey
       );
-
-      // 2通目: お問い合わせ者に自動返信メールを送信
-      if (autoReplyTemplateId) {
-        await emailjs.send(
-          serviceId,
-          autoReplyTemplateId,
-          {
-            from_name: formData.name,
-            from_email: formData.email,
-            message: formData.message,
-          },
-          publicKey
-        );
-      }
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
@@ -95,9 +81,6 @@ const Contact = () => {
         <p className="mt-5 max-w-2xl text-[15px] leading-8 text-ink-2">
           採用・インターン・開発に関するご連絡はこちらからお願いします。
           このサイトに書いた内容について、詳しく聞きたい点があればその旨をお書きください。
-          <span className="mt-2 block text-[13px] text-ink-3">
-            ※ 文言は暫定です。
-          </span>
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">

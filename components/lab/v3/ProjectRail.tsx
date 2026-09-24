@@ -42,6 +42,12 @@ const HOVER_DWELL = 200; // ms
 /** 開始点からこれ以上動いたらドラッグとみなす（普通のクリックを誤判定しない） */
 const DRAG_THRESHOLD = 7; // px
 
+/**
+ * この上で押し始めたときは drag を開始しない（pointer capture も取らない）。
+ * リンクやボタンを普通に押しただけでクリックが奪われるのを防ぐ。
+ */
+const INTERACTIVE = "a, button, input, textarea, select, [role='button'], [contenteditable='true']";
+
 const SETS = 3;
 
 type Item = (typeof v3Rail)[number];
@@ -87,6 +93,8 @@ function RailCard({
   suppressClick: React.MutableRefObject<boolean>;
 }) {
   const before = "beforeImage" in item ? item : null;
+  /** Thank x Chain のみ。既定は「作り直した後」を見せる。 */
+  const [showBefore, setShowBefore] = useState(false);
 
   return (
     <li
@@ -99,6 +107,12 @@ function RailCard({
       <article
         style={{ "--card-accent": item.accent } as React.CSSProperties}
         className="group/card flex h-full flex-col"
+        onPointerLeave={() => before && setShowBefore(false)}
+        onBlurCapture={(e) => {
+          if (before && !e.currentTarget.contains(e.relatedTarget as Node | null)) {
+            setShowBefore(false);
+          }
+        }}
       >
         {/* --- visual: 作品ごとに高さと収め方を変える --- */}
         <div
@@ -118,27 +132,57 @@ function RailCard({
             }`}
           />
 
-          {/* Thank x Chain だけ、作り直す前の画面を重ねる。
-              hover で「前」が少し引いて「後」が見えるが、ラベルは常に読める。 */}
+          {/*
+            Thank x Chain だけ、再設計の前後を重ねて見せる。
+            画像を切り替える演出ではなく、「一度作ったものをチームで見直して
+            作り直した」という過程そのものの可視化。
+            hover / focus / tap のどれでも切り替わり、ラベルは常時読める。
+          */}
           {before && (
             <>
-              <span className="absolute left-3 top-3 rounded-full bg-[var(--v3-bg)]/80 px-2.5 py-1 text-[10px] text-[var(--v3-fg)] backdrop-blur-sm">
-                {before.afterLabel}
-              </span>
-              <div className="absolute bottom-3 left-3 w-[42%] overflow-hidden rounded-[10px] ring-1 ring-[var(--v3-rule)] transition-all duration-[450ms] ease-out motion-safe:group-hover/card:translate-y-2 motion-safe:group-hover/card:opacity-70">
-                <div className="relative aspect-[16/10]">
-                  <Image
-                    src={before.beforeImage}
-                    alt="作り直す前の Thanks の画面"
-                    width={2442}
-                    height={1330}
-                    draggable={false}
-                    className="h-full w-full select-none object-cover object-top"
-                  />
-                </div>
-                <span className="absolute inset-x-0 bottom-0 bg-[var(--v3-bg)]/85 px-2 py-1 text-[9px] text-[var(--v3-fg-2)]">
-                  {before.beforeLabel}（最初）
-                </span>
+              <Image
+                src={before.beforeImage}
+                alt="再設計する前の Thanks の画面"
+                width={2442}
+                height={1330}
+                draggable={false}
+                aria-hidden={!showBefore}
+                className="absolute inset-0 h-full w-full select-none object-cover object-top transition-opacity duration-[420ms] ease-out"
+                style={{ opacity: showBefore ? 1 : 0 }}
+              />
+
+              {/* Before / After の現在地。常時読める。 */}
+              <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-[var(--v3-bg)]/85 p-1 backdrop-blur-sm">
+                {(
+                  [
+                    [true, before.beforeLabel],
+                    [false, before.afterLabel],
+                  ] as const
+                ).map(([isBefore, label]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    tabIndex={clone ? -1 : undefined}
+                    aria-pressed={showBefore === isBefore}
+                    onPointerEnter={() => setShowBefore(isBefore)}
+                    onFocus={() => setShowBefore(isBefore)}
+                    onClick={(e) => {
+                      // Rail の drag 直後のクリックは無視する
+                      if (suppressClick.current) {
+                        e.preventDefault();
+                        return;
+                      }
+                      setShowBefore(isBefore);
+                    }}
+                    className={`rounded-full px-2.5 py-[3px] text-[10px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)] ${
+                      showBefore === isBefore
+                        ? "bg-[var(--v3-fg)] text-[var(--v3-bg)]"
+                        : "text-[var(--v3-fg-2)] hover:text-[var(--v3-fg)]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </>
           )}
@@ -187,7 +231,10 @@ function RailCard({
               <dd className="text-[var(--v3-fg)]">{item.role}</dd>
             </div>
             <div className="flex gap-3">
-              <dt className="w-9 shrink-0 text-[var(--v3-fg-2)]">結果</dt>
+              {/* 「結果」で一律にせず、意味に応じて 受賞 / 参加 / 制作機会 を出す */}
+              <dt className="w-9 shrink-0 text-[var(--v3-fg-2)]">
+                {"resultLabel" in item ? item.resultLabel : "結果"}
+              </dt>
               <dd className="text-[var(--v3-fg)]">{item.result}</dd>
             </div>
           </dl>
@@ -440,6 +487,14 @@ export default function ProjectRail() {
     (e: React.PointerEvent<HTMLDivElement>) => {
       const track = trackRef.current;
       if (!track) return;
+
+      // リンク・ボタン上で押した場合は drag にしない。
+      // capture を取るとクリックが阻害されるため、blocker だけ立てて抜ける。
+      if ((e.target as Element | null)?.closest?.(INTERACTIVE)) {
+        setBlocker("dragging", true);
+        return;
+      }
+
       // touch はブラウザのネイティブスクロールに任せる（慣性を壊さない）
       if (e.pointerType !== "mouse") {
         setBlocker("dragging", true);

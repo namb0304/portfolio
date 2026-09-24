@@ -15,6 +15,7 @@ import { FaArrowRight } from "react-icons/fa6";
 import Flow from "./Flow";
 import ProjectRail from "./ProjectRail";
 import { useProximity } from "./motion";
+import SectionHead from "./SectionHead";
 import { TECH } from "./techIcons";
 import { v3Featured } from "@/config/v3";
 
@@ -83,7 +84,7 @@ function HiroliaComposition() {
   }
 
   return (
-    <div className="relative pb-6 pl-10 sm:pb-0 sm:pl-16">
+    <div className="relative pb-6 pl-9 sm:pb-0 sm:pl-12">
       {/* --- ブラウザ枠。LP は object-contain 相当で全体が見える --- */}
       <figure className="overflow-hidden rounded-[12px] border border-[var(--v3-rule)] bg-[var(--v3-bg)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.9)]">
         <figcaption className="flex items-center gap-2 border-b border-[var(--v3-rule)] px-3 py-2">
@@ -106,7 +107,7 @@ function HiroliaComposition() {
 
       {/* --- 来店客の実機画面。枠の左下に重ねる --- */}
       {!phoneFailed && (
-        <div className="absolute bottom-0 left-0 w-[92px] overflow-hidden rounded-[16px] border-[5px] border-[var(--v3-rule)] bg-[var(--v3-bg)] shadow-[0_22px_48px_-16px_rgba(0,0,0,0.95)] transition-transform duration-[600ms] ease-out sm:-bottom-5 sm:w-[124px] motion-safe:group-hover:-translate-y-2">
+        <div className="absolute bottom-0 left-0 w-[86px] overflow-hidden rounded-[14px] border-[4px] border-[var(--v3-rule)] bg-[var(--v3-bg)] shadow-[0_22px_48px_-16px_rgba(0,0,0,0.95)] transition-transform duration-[600ms] ease-out sm:-bottom-4 sm:w-[104px] motion-safe:group-hover:-translate-y-2">
           <div className="relative" style={{ aspectRatio: "792 / 1628" }}>
             <Image
               src={phone.src}
@@ -129,15 +130,12 @@ export default function Work() {
 
   return (
     <section id="projects" className="scroll-mt-24">
-      <div className="mx-auto max-w-[1180px] px-6 pt-24 md:px-10 md:pt-32">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-[26px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
-            つくったもの
-          </h2>
-          <p className="text-[13px] text-[var(--v3-fg-2)]">
-            いちばん長く関わっているものから
-          </p>
-        </div>
+      <div className="mx-auto max-w-[1180px] px-6 pt-28 md:px-10 md:pt-40">
+        <SectionHead
+          level="primary"
+          title="つくったもの"
+          note="いちばん長く関わっているものから。Hirolia は実際の店舗で動いています。"
+        />
 
         {/* ===== Featured: Hirolia ==================================== */}
         <div
@@ -150,7 +148,7 @@ export default function Work() {
               "--prox": "0",
             } as React.CSSProperties
           }
-          className="group relative mt-10 overflow-hidden rounded-[20px] border border-[var(--v3-rule)] bg-[var(--v3-surface)]/40 transition-[transform,box-shadow] duration-300 ease-out hover:shadow-[0_24px_60px_-32px_rgba(0,0,0,0.95)] motion-safe:hover:-translate-y-[2px]"
+          className="group relative mt-10 overflow-hidden rounded-[20px] border border-[var(--v3-rule)] bg-[var(--v3-surface)]/40 transition-[box-shadow] duration-300 ease-out hover:shadow-[0_18px_44px_-34px_rgba(0,0,0,0.9)]"
         >
           {active && (
             <>
@@ -181,26 +179,16 @@ export default function Work() {
                   transition: "opacity 220ms ease-out",
                 }}
               />
-              {/* 面の奥行き。色は付けず、白をごく薄く。カード内でだけ効かせる。 */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
-                style={{
-                  background:
-                    "radial-gradient(500px circle at var(--mx) var(--my), rgba(255,255,255,0.035), transparent 48%)",
-                }}
-              />
             </>
           )}
 
-          {/* サービスサイト + 実機画面。カードの上部に1つの composition として置く。 */}
-          <div className="relative z-[2] px-6 pt-7 md:px-8 md:pt-8">
-            <div className="mx-auto max-w-[760px]">
-              <HiroliaComposition />
-            </div>
-          </div>
-
-          <div className="relative z-[2] grid grid-cols-1 gap-x-10 p-7 md:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,300px)] lg:items-end">
+          {/*
+            以前は 画像 → テキスト → Problem/Role/Current の縦積みで、
+            カード単体が 1280x900 のほぼ全画面（893px）を占有していた。
+            説明を左 42% / visual を右 58% の非対称2カラムにして圧縮する。
+          */}
+          <div className="relative z-[2] grid grid-cols-1 gap-x-10 gap-y-8 p-7 md:p-8 lg:grid-cols-[minmax(0,42fr)_minmax(0,58fr)] lg:items-center lg:gap-x-12">
+            {/* ---------- 左: 説明 ---------- */}
             <div>
               <span className="inline-flex items-center gap-2 text-[12px] text-[var(--v3-fg-2)]">
                 <span
@@ -211,24 +199,34 @@ export default function Work() {
                 {v3Featured.tagline}
               </span>
 
-              <h3 className="mt-3 text-[28px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[34px]">
+              <h3 className="mt-2.5 text-[27px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[32px]">
                 {v3Featured.name}
               </h3>
 
-              <p className="mt-3 max-w-[34rem] text-[14px] leading-7 text-[var(--v3-fg-2)]">
+              <p className="mt-3 text-[14px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
                 {v3Featured.summary}
               </p>
 
-              <p className="mt-3 text-[13px] text-[var(--v3-fg-2)]">
+              <p className="mt-3 text-[12px] text-[var(--v3-fg-2)]">
                 {v3Featured.team}
-                <span className="mx-2.5 text-[var(--v3-rule)]">|</span>
+                <span className="mx-2 text-[var(--v3-rule)]">|</span>
                 {v3Featured.period}
               </p>
-            </div>
 
-            <div className="mt-6 lg:mt-0">
-              {/* 主要技術は3点まで。残りは詳細ページ。 */}
-              <ul className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              {/*
+                Problem / My Role / Current は下部に横帯で再掲していたが、
+                左本文と内容が重複していたのでここへ1回だけ統合した。
+                「つながり」の motif は縦向きで維持する。
+              */}
+              <div className="mt-6">
+                <Flow
+                  nodes={v3Featured.flow}
+                  accent={v3Featured.accent}
+                  orientation="vertical"
+                />
+              </div>
+
+              <ul className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
                 {v3Featured.tech.map((k) => {
                   const t = TECH[k];
                   if (!t) return null;
@@ -251,7 +249,7 @@ export default function Work() {
 
               <Link
                 href={`${v3Featured.href}?from=lab`}
-                className="group/cta mt-5 inline-flex items-center gap-2.5 rounded-[10px] bg-[var(--v3-fg)] px-6 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+                className="group/cta mt-6 inline-flex items-center gap-2.5 rounded-[10px] bg-[var(--v3-fg)] px-6 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
               >
                 詳細を見る
                 <FaArrowRight
@@ -260,11 +258,11 @@ export default function Work() {
                 />
               </Link>
             </div>
-          </div>
 
-          {/* Problem → My Role → Current。数字カードは並べない。 */}
-          <div className="relative z-[2] border-t border-[var(--v3-rule)] px-7 pb-7 pt-6 md:px-8">
-            <Flow nodes={v3Featured.flow} accent={v3Featured.accent} />
+            {/* ---------- 右: 実画面 ---------- */}
+            <div className="order-first lg:order-none">
+              <HiroliaComposition />
+            </div>
           </div>
         </div>
 
@@ -273,7 +271,19 @@ export default function Work() {
       {/* ===== Project Rail（画面端まで抜けさせる） =================== */}
       <ProjectRail />
 
-      <div className="pb-24 md:pb-32" />
+      {/*
+        Hirolia で視点が「作る」から「使われ続ける」へ変わったことが、
+        次の Internships へ進む前に一度だけ立ち上がるようにする。
+        新しいセクションは足さず、1行と余白だけで渡す。
+      */}
+      <div className="mx-auto max-w-[1180px] px-6 pt-24 pb-28 md:px-10 md:pt-32 md:pb-40">
+        <p className="max-w-[30rem] text-[19px] font-medium leading-[1.9] text-[var(--v3-fg)] [word-break:auto-phrase] md:text-[23px]">
+          「技術的に動くもの」と「現場で使われ続けるもの」は違う。
+        </p>
+        <p className="mt-4 max-w-[30rem] text-[14px] leading-8 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
+          店舗に入れてから知りました。ここから、外に出て学ぶことが増えました。
+        </p>
+      </div>
     </section>
   );
 }
