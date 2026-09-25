@@ -13,7 +13,7 @@
  *   巨大背景写真の廃止 / カードの均一サイズの廃止 / トグル類の廃止
  */
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaArrowRight, FaBars, FaGithub, FaTimes } from "react-icons/fa";
 import Turn from "./Turn";
 import Work from "./Work";
@@ -68,9 +68,19 @@ export default function HomeV3() {
     return () => io.disconnect();
   }, []);
 
+  /*
+    Escape で閉じたときは、開いたボタンへフォーカスを戻す。
+    戻さないとフォーカスが消えた場所に残り、次の Tab が
+    ページ先頭からやり直しになる。
+  */
+  const menuButton = useRef<HTMLButtonElement | null>(null);
   useEffect(() => {
     if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenuOpen(false);
+      menuButton.current?.focus();
+    };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
@@ -125,6 +135,7 @@ export default function HomeV3() {
 
           <button
             type="button"
+            ref={menuButton}
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
             aria-controls="v3-menu"
@@ -180,6 +191,8 @@ export default function HomeV3() {
                   width={776}
                   height={776}
                   priority
+                  /* 実寸 96px 固定。これを伝えないと 776 / 1552px を取りに行く */
+                  sizes="96px"
                   className="h-full w-full object-cover object-top"
                 />
               </div>
@@ -287,6 +300,8 @@ export default function HomeV3() {
                   width={776}
                   height={776}
                   priority
+                  /* グリッド左列は 320px 固定 */
+                  sizes="320px"
                   className="h-full w-full object-cover object-top"
                 />
               </div>

@@ -99,6 +99,8 @@ function HiroliaComposition() {
             alt={"alt" in shot ? shot.alt : "Hirolia のサービスサイト"}
             width={"width" in shot ? shot.width : 2940}
             height={"height" in shot ? shot.height : 1912}
+            /* 実寸: 320px幅で161 / 768で557 / 1024以上で最大522 */
+            sizes="(min-width: 1024px) 560px, (min-width: 768px) 75vw, 60vw"
             onError={() => setLpFailed(true)}
             className="h-full w-full object-cover transition-transform duration-[600ms] ease-out motion-safe:group-hover:scale-[1.015]"
           />
@@ -114,6 +116,8 @@ function HiroliaComposition() {
               alt={phone.alt}
               width={phone.width}
               height={phone.height}
+              /* 枠の内側は 78px / sm 以上で 96px */
+              sizes="(min-width: 640px) 96px, 78px"
               onError={() => setPhoneFailed(true)}
               className="h-full w-full object-cover object-top"
             />

@@ -125,6 +125,8 @@ function RailCard({
             width={1600}
             height={1200}
             draggable={false}
+            /* カード実寸: 320px幅で262 / 390で320 / 768以上で400 */
+            sizes="(min-width: 768px) 400px, (min-width: 380px) 320px, 262px"
             className={`h-full w-full select-none transition-transform duration-[500ms] ease-out motion-safe:group-hover/card:scale-[1.02] ${
               item.imageFit === "contain"
                 ? "object-contain p-3"
@@ -146,6 +148,7 @@ function RailCard({
                 width={2442}
                 height={1330}
                 draggable={false}
+                sizes="(min-width: 768px) 400px, (min-width: 380px) 320px, 262px"
                 aria-hidden={!showBefore}
                 className="absolute inset-0 h-full w-full select-none object-cover object-top transition-opacity duration-[420ms] ease-out"
                 style={{ opacity: showBefore ? 1 : 0 }}
@@ -488,12 +491,15 @@ export default function ProjectRail() {
       const track = trackRef.current;
       if (!track) return;
 
-      // リンク・ボタン上で押した場合は drag にしない。
-      // capture を取るとクリックが阻害されるため、blocker だけ立てて抜ける。
-      if ((e.target as Element | null)?.closest?.(INTERACTIVE)) {
-        setBlocker("dragging", true);
-        return;
-      }
+      /*
+        リンク・ボタンの上で押した場合は drag ではない。
+        ここで dragging を立てると、capture を取っていないぶん
+        Rail の外で指を離したときに pointerup を受け取れず、
+        blocker が立ったまま自動スクロールが戻らなくなる。
+        ポインタは Rail 上にあるので hovered 側で止まっており、
+        ここで何もしなくても勝手に動き出すことはない。
+      */
+      if ((e.target as Element | null)?.closest?.(INTERACTIVE)) return;
 
       // touch はブラウザのネイティブスクロールに任せる（慣性を壊さない）
       if (e.pointerType !== "mouse") {
@@ -554,6 +560,28 @@ export default function ProjectRail() {
     [setBlocker]
   );
 
+  /*
+    Rail の外で指やボタンを離すと、track の pointerup は発火しない。
+    dragging が立っている間だけ window 側でも終了を待ち、
+    どこで離しても必ず解除されるようにする。
+  */
+  useEffect(() => {
+    const clear = () => {
+      if (!blockers.current.dragging) return;
+      drag.current.id = -1;
+      setBlocker("dragging", false);
+      window.setTimeout(() => {
+        suppressClick.current = false;
+      }, 0);
+    };
+    window.addEventListener("pointerup", clear);
+    window.addEventListener("pointercancel", clear);
+    return () => {
+      window.removeEventListener("pointerup", clear);
+      window.removeEventListener("pointercancel", clear);
+    };
+  }, [setBlocker]);
+
   /* --- focus: Rail 内にフォーカスがある間は絶対に再開しない --- */
   const onFocusCapture = useCallback(
     () => setBlocker("focused", true),
@@ -594,17 +622,25 @@ export default function ProjectRail() {
             <h3 className="text-[20px] font-bold tracking-tight text-[var(--v3-fg)] md:text-[24px]">
               ほかにつくったもの
             </h3>
-            {/* 自動で動き続けるので、明示的に止められるようにする */}
-            <button
-              type="button"
-              onClick={() => setPaused((v) => !v)}
-              aria-pressed={paused}
-              aria-label={paused ? "自動スクロールを再生" : "自動スクロールを停止"}
-              title={paused ? "再生" : "停止"}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--v3-rule)] text-[10px] text-[var(--v3-fg-2)] transition-colors duration-200 hover:border-[var(--v3-accent)]/60 hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
-            >
-              {paused ? <FaPlay /> : <FaPause />}
-            </button>
+            {/*
+              自動で動き続けるので、明示的に止められるようにする。
+              動きを止める設定のときは自動スクロール自体が走らないので、
+              押しても何も起きないボタンは出さない。
+            */}
+            {!reduced && (
+              <button
+                type="button"
+                onClick={() => setPaused((v) => !v)}
+                aria-pressed={paused}
+                aria-label={
+                  paused ? "自動スクロールを再生" : "自動スクロールを停止"
+                }
+                title={paused ? "再生" : "停止"}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--v3-rule)] text-[10px] text-[var(--v3-fg-2)] transition-colors duration-200 hover:border-[var(--v3-accent)]/60 hover:text-[var(--v3-fg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+              >
+                {paused ? <FaPlay /> : <FaPause />}
+              </button>
+            )}
           </div>
           <p className="text-[12px] text-[var(--v3-fg-2)]">
             {reduced

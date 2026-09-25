@@ -60,10 +60,6 @@
   }
 }
 
-.group:hover a {
-  transform: rotateY(0deg) scale(1.05) translateZ(50px) !important;
-}
-
 /* === Embla Carousel 2D Coverflow Styles (最終修正版) === */
 .embla {
   position: relative;

@@ -28,6 +28,9 @@ export type ContactErrors = Partial<Record<keyof ContactFields, string>>;
 
 const EMPTY: ContactFields = { name: "", email: "", subject: "", message: "" };
 
+/** 画面に並んでいる順。エラー時にどこへ案内するかをこの順で決める。 */
+const ORDER: (keyof ContactFields)[] = ["name", "email", "subject", "message"];
+
 /** ブラウザと同等のゆるい判定。厳格にしすぎて正当なアドレスを弾かない。 */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,7 +46,10 @@ export function validate(values: ContactFields): ContactErrors {
   return errors;
 }
 
-export function useContactForm() {
+export function useContactForm({
+  /** 入力に不備があったとき、最初の該当フィールドを知らせる */
+  onInvalid,
+}: { onInvalid?: (field: keyof ContactFields) => void } = {}) {
   const [values, setValues] = useState<ContactFields>(EMPTY);
   const [errors, setErrors] = useState<ContactErrors>({});
   const [status, setStatus] = useState<ContactStatus>("idle");
@@ -59,9 +65,19 @@ export function useContactForm() {
       e.preventDefault();
       if (status === "sending") return; // 二重送信防止
 
+      /*
+        新しい送信を始めた時点で、前回の結果表示は消す。
+        残したままだと「送信しました」の下に必須エラーが並び、
+        送れたのか送れていないのかが読めなくなる。
+      */
+      setStatus("idle");
+
       const found = validate(values);
       if (Object.keys(found).length > 0) {
         setErrors(found);
+        // 画面の並び順で最初の不備へ案内する
+        const first = ORDER.find((k) => found[k]);
+        if (first) onInvalid?.(first);
         return;
       }
 
@@ -103,7 +119,7 @@ export function useContactForm() {
         setStatus("error");
       }
     },
-    [status, values]
+    [status, values, onInvalid]
   );
 
   return { values, errors, status, setField, submit };

@@ -5,7 +5,7 @@
  * どれも Home では「概要」に留める。長文は詳細ページへ逃がす前提。
  */
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFinePointer, useScrollProgress } from "./motion";
 import type { IconType } from "react-icons";
 import {
@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa6";
 import SectionHead from "./SectionHead";
 import { TECH } from "./techIcons";
-import { useContactForm } from "@/hooks/useContactForm";
+import { useContactForm, type ContactFields } from "@/hooks/useContactForm";
 import { v3Activities, v3Experience, v3Profile, v3Skills } from "@/config/v3";
 
 
@@ -43,18 +43,15 @@ function Block({
   lead,
   points,
   active = false,
-  headingId,
 }: {
   label: string;
   lead?: string;
   points: readonly string[];
   active?: boolean;
-  headingId?: string;
 }) {
   return (
     <div>
       <h4
-        id={headingId}
         className={`text-[12px] font-bold tracking-[0.04em] transition-colors duration-200 ${
           active ? "text-[var(--v3-accent)]" : "text-[var(--v3-fg-2)]"
         }`}
@@ -193,32 +190,27 @@ function ReadingPanel({
         />
       )}
 
-      {blocks.map((b, i) => {
-        const headingId = `exp-${e.key}-h${i}`;
-        return (
-          <div
-            key={b.label}
-            ref={(el) => {
-              blockRefs.current[i] = el;
-            }}
-            /* キーボードでも同じ active を得られるようにする */
-            role="group"
-            tabIndex={open ? 0 : -1}
-            aria-labelledby={headingId}
-            onFocus={() => setActive(i)}
-            onBlur={() => setActive((v) => (v === i ? -1 : v))}
-            className="rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--v3-accent)]"
-          >
-            <Block
-              label={b.label}
-              lead={"lead" in b ? b.lead : undefined}
-              points={b.points}
-              active={active === i}
-              headingId={headingId}
-            />
-          </div>
-        );
-      })}
+      {blocks.map((b, i) => (
+        /*
+          読むだけの本文なので、操作対象にはしない。
+          Tab 停止を足すと、キーボード利用者は開閉ボタンのほかに
+          3 つの通過点を踏まされる。marker はあくまで pointer 利用者向けの
+          補助表示で、無くても 3 つの違いは見出しと構造で読める。
+        */
+        <div
+          key={b.label}
+          ref={(el) => {
+            blockRefs.current[i] = el;
+          }}
+        >
+          <Block
+            label={b.label}
+            lead={"lead" in b ? b.lead : undefined}
+            points={b.points}
+            active={active === i}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -289,7 +281,12 @@ function ExperienceItem({ e }: { e: (typeof v3Experience)[number] }) {
           open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >
-        <div className="overflow-hidden">
+        {/*
+          閉じている間は高さ 0 で見えないだけで、読み上げには残ってしまう。
+          inert で支援技術とフォーカスの両方から外し、開閉の状態と
+          アクセシビリティツリーを一致させる。
+        */}
+        <div className="overflow-hidden" inert={!open} aria-hidden={!open}>
           <ReadingPanel e={e} open={open} />
         </div>
       </div>
@@ -347,23 +344,26 @@ export function Skills() {
                   const entry = ICONS[it.icon];
                   const Icon = entry?.Icon;
                   return (
+                    /*
+                      リンクでもボタンでもないので Tab では止めない。
+                      hover の色だけ残す（キーボード利用者は素通りできる）。
+                    */
                     <li
                       key={it.name}
-                      tabIndex={0}
                       style={{ "--brand": entry?.brand } as React.CSSProperties}
-                      className="group flex items-center gap-3.5 rounded-[12px] border border-transparent px-3 py-2.5 transition-[background-color,border-color] duration-200 hover:border-[var(--brand)]/35 hover:bg-[var(--v3-fg)]/[0.04] focus-visible:border-[var(--brand)]/35 focus-visible:bg-[var(--v3-fg)]/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
+                      className="group flex items-center gap-3.5 rounded-[12px] border border-transparent px-3 py-2.5 transition-[background-color,border-color] duration-200 hover:border-[var(--brand)]/35 hover:bg-[var(--v3-fg)]/[0.04]"
                     >
                       {Icon && (
                         <span className="shrink-0 text-[20px] text-[var(--v3-fg-2)]">
                           {/* 静止時は落ち着いた無彩色。hover / focus でその技術の色だけ戻る。 */}
-                          <Icon className="transition-[color,filter] duration-200 group-hover:text-[var(--brand)] group-hover:[filter:drop-shadow(0_0_7px_var(--brand))] group-focus-visible:text-[var(--brand)]" />
+                          <Icon className="transition-[color,filter] duration-200 group-hover:text-[var(--brand)] group-hover:[filter:drop-shadow(0_0_7px_var(--brand))]" />
                         </span>
                       )}
                       <span className="min-w-0">
                         <span className="block truncate text-[14px] text-[var(--v3-fg)]">
                           {it.name}
                         </span>
-                        <span className="block truncate text-[11px] text-[var(--v3-fg-2)] transition-colors duration-200 group-hover:text-[var(--v3-fg)] group-focus-visible:text-[var(--v3-fg)]">
+                        <span className="block truncate text-[11px] text-[var(--v3-fg-2)] transition-colors duration-200 group-hover:text-[var(--v3-fg)]">
                           {it.where}
                         </span>
                       </span>
@@ -609,7 +609,17 @@ export function GitHubActivity() {
 /* ------------------------------------------------------------------ Contact */
 
 export function Contact() {
-  const { values, errors, status, setField, submit } = useContactForm();
+  /* 入力に不備があったら、その最初のフィールドへ実際に移動する */
+  const inputs = useRef<Partial<Record<keyof ContactFields, HTMLElement | null>>>(
+    {}
+  );
+  const focusInvalid = useCallback(
+    (field: keyof ContactFields) => inputs.current[field]?.focus(),
+    []
+  );
+  const { values, errors, status, setField, submit } = useContactForm({
+    onInvalid: focusInvalid,
+  });
   const sending = status === "sending";
 
   const fields = [
@@ -647,6 +657,12 @@ export function Contact() {
                 <input
                   id={f.id}
                   type={f.type}
+                  ref={(el) => {
+                    inputs.current[f.key] = el;
+                  }}
+                  /* 表示は独自メッセージで行うので noValidate のままにし、
+                     required は支援技術へ必須であることを伝えるために付ける */
+                  required={f.required}
                   value={values[f.key]}
                   onChange={(e) => setField(f.key, e.target.value)}
                   disabled={sending}
@@ -681,6 +697,10 @@ export function Contact() {
             <textarea
               id="v3-message"
               rows={5}
+              ref={(el) => {
+                inputs.current.message = el;
+              }}
+              required
               value={values.message}
               onChange={(e) => setField("message", e.target.value)}
               disabled={sending}

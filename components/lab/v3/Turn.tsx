@@ -20,17 +20,20 @@
 import { useScrollProgress } from "./motion";
 
 /**
- * scroll progress の from〜to 区間で、ぼんやり → くっきり に変わる一片。
+ * scroll progress の from〜to 区間で、少し沈んだ状態 → くっきり に変わる一片。
  *
  * --l はこの一片のローカル進捗(0〜1)。opacity / blur / translate の 3 つだけを
  * 動かす。scale も色も動かさないので、文字は最後まで同じ形・同じ色で読める。
+ *
+ * 主役は opacity と translate。blur はごく薄い補助で、最大でも 1.5px しか
+ * かけない。強くかけると、入ってきた直後の文章が読めなくなる。
  */
 function Phrase({
   from,
   to,
   className = "",
   rise = 10,
-  floor = 0.22,
+  floor = 0.55,
   children,
 }: {
   from: number;
@@ -39,8 +42,11 @@ function Phrase({
   /** 立ち上がりに使う移動量(px)。本文は控えめ、補足はさらに控えめ。 */
   rise?: number;
   /**
-   * 立ち上がる前の最低不透明度。0 にすると区画へ入った直後が真っ白になり、
-   * 「何も無い画面を通過させられる」体験になるので、薄く置いておく。
+   * 立ち上がる前の最低不透明度。
+   *
+   * ここを低くすると「読むためにスクロールさせられる」体験になる。
+   * 画面に入った時点で文章は普通に読めるのが正しく、スクロールで加わるのは
+   * 演出のほうなので、最初からはっきり読める濃さから始める。
    */
   floor?: number;
   children: React.ReactNode;
@@ -52,7 +58,7 @@ function Phrase({
         {
           "--l": `clamp(0, calc((var(--p) - ${from}) / ${(to - from).toFixed(3)}), 1)`,
           opacity: `calc(${floor} + var(--l) * ${(1 - floor).toFixed(3)})`,
-          filter: "blur(calc((1 - var(--l)) * 4px))",
+          filter: "blur(calc((1 - var(--l)) * 1.5px))",
           transform: `translateY(calc((1 - var(--l)) * ${rise}px))`,
         } as React.CSSProperties
       }
@@ -145,7 +151,7 @@ export default function Turn() {
               from={0.56}
               to={0.74}
               rise={6}
-              floor={0.05}
+              floor={0.3}
               className="mt-6 text-[14px] leading-8 md:mt-8 text-[var(--v3-fg-2)] [word-break:auto-phrase] md:text-[15px]"
             >
               実店舗へ届けて、初めて見えたことでした。
