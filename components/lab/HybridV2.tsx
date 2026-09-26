@@ -20,7 +20,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { OpsScreenMock, OrderScreenMock, SketchTag, StorePhotoMock } from "./Mocks";
-import { JP_SANS } from "@/app/design-lab/fonts";
+import { JP_SANS } from "@/components/lab/design-lab/fonts";
 import {
   HIROLIA_SHOT,
   hybrid,

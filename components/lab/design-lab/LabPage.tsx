@@ -1,9 +1,13 @@
 "use client";
 
 /**
- * /design-lab — Visual Direction の比較用ページ。
+ * Visual Direction の比較用ページ（旧 /design-lab）。
  *
- * - サイト本体ではない。TOP には一切反映していない。
+ * 2026-09-26 に Home v3 を正式な / へ昇格したので、このページはルートから外した。
+ * /design-lab へのアクセスは next.config.ts の redirect で / へ送る。
+ * 比較UIと検証用の注釈を公開状態で見せないため、ファイルは残すがルートには置かない。
+ *
+ * - サイト本体ではない。
  * - 3案は**同じコンテンツ**（config/lab.ts）を使う。違うのは構図・密度・階層・インタラクション。
  * - 各案で作るのは Header / Hero / Featured Hirolia / Secondary work の4ブロックのみ。
  */
@@ -55,7 +59,7 @@ const directions = [
   },
 ];
 
-export default function DesignLab() {
+export default function LabPage() {
   const [view, setView] = useState<Key>("V3");
 
   const show = (k: "V3" | "H" | "A" | "B" | "C") => view === "all" || view === k;

@@ -20,19 +20,38 @@ import { FaArrowLeft, FaArrowUpRightFromSquare } from "react-icons/fa6";
 import SectionNav from "@/components/work/SectionNav";
 import { V3_SANS, v3Palette } from "@/components/lab/v3/tokens";
 import { hirolia } from "@/config/spike";
+import { OG_IMAGE, SITE_NAME } from "@/config/site";
+
+const DESCRIPTION =
+  "飲食店向けモバイルオーダー「Hirolia」のケーススタディ。5人チームでの開発で、注文画面・メニュー管理画面・APIの実装とDB設計、本番運用を担当しました。導入後に出た問題と、その改善までを書いています。";
 
 export const metadata: Metadata = {
-  title: "Hirolia — 飲食店向けモバイルオーダー ｜ 南保 俊輔",
-  description:
-    "実店舗へ導入したあとに出た問題と、その改善。設計・実装から本番運用まで、自分が担当した範囲のケーススタディ。",
+  title: { absolute: "Hirolia｜南保 俊輔 ポートフォリオ" },
+  description: DESCRIPTION,
+  alternates: { canonical: "/work/hirolia" },
+  /* layout の openGraph はページ側の指定で置き換わるので、共有画像もここに書く */
+  openGraph: {
+    type: "article",
+    locale: "ja_JP",
+    siteName: SITE_NAME,
+    images: [OG_IMAGE],
+    url: "/work/hirolia",
+    title: "Hirolia｜南保 俊輔 ポートフォリオ",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [OG_IMAGE.url],
+    title: "Hirolia｜南保 俊輔 ポートフォリオ",
+    description: DESCRIPTION,
+  },
 };
 
 /**
- * Home の場所。昇格前なので、いまは /design-lab が正式な Home。
- * 本番 / へ昇格したら、ここを "" に変えるだけで全部の導線が切り替わる。
- * URL をページ内に散らさないための 1 箇所。
+ * Home の場所。URL をページ内に散らさないための 1 箇所。
+ * このページからの「戻る」はすべてここを起点にする。
  */
-const HOME = "/design-lab";
+const HOME = "/";
 const BACK = { href: `${HOME}#projects`, label: "Projects へ戻る" };
 
 /**

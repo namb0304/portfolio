@@ -13,7 +13,7 @@
  */
 import Link from "next/link";
 import { BrowserFrame, Shot, ShotNote, ShotPlaceholder } from "./Frames";
-import { JP_SANS } from "@/app/design-lab/fonts";
+import { JP_SANS } from "@/components/lab/design-lab/fonts";
 import {
   HIROLIA_SHOT,
   HIROLIA_SHOT_NOTE,

@@ -1,41 +1,47 @@
 /**
- * Visual Spike 2026-09 — TOP。
- * 情報の順番：何者か → 一番強い証拠 → その他の経験 → どう考えるようになったか → 技術的な裏付け。
- * 旧構成は components/LegacyHome.tsx にそのまま残してある（戻す場合はそれを返す）。
+ * Home。
+ *
+ * 中身は components/lab/v3/HomeV3。検証中は /design-lab に置いていたものを、
+ * そのままここへ昇格した（見た目・文章は変えていない）。
+ * ヘッダー / フッターは HomeV3 が自前で持つので、ここでは何も足さない。
+ *
+ * 旧Homeの構成は components/spike/SpikeHome.tsx に残してある。
  */
-import Hero from "@/components/spike/Hero";
-import FeaturedHirolia from "@/components/spike/FeaturedHirolia";
-import SelectedWork from "@/components/spike/SelectedWork";
-import ThinkingSection from "@/components/spike/ThinkingSection";
-import TechnicalExperience from "@/components/spike/TechnicalExperience";
-import Milestones from "@/components/spike/Milestones";
-import SpikeGitHub from "@/components/spike/SpikeGitHub";
-import Contact from "@/components/Contact";
+import type { Metadata } from "next";
+import HomeV3 from "@/components/lab/v3/HomeV3";
+import { OG_IMAGE, SITE_NAME } from "@/config/site";
+
+export const metadata: Metadata = {
+  /* テンプレート（%s｜…）を当てず、この1本で見せる */
+  title: {
+    absolute: "南保俊輔｜2028卒 エンジニア志望・ポートフォリオ",
+  },
+  description:
+    "顧客の課題を理解し、「何をつくるか」から提案できるエンジニアを目指しています。飲食店向けモバイルオーダー「Hirolia」で、注文画面・メニュー管理画面・APIの実装、DB設計、本番運用を担当。武蔵野大学 データサイエンス学部3年（2028年3月卒業予定）。",
+  alternates: { canonical: "/" },
+  /*
+    openGraph / twitter はページ側で書くと layout の指定を丸ごと置き換える。
+    siteName と images をここでも書いているのはそのため（消すと共有画像が出ない）。
+  */
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    siteName: SITE_NAME,
+    images: [OG_IMAGE],
+    url: "/",
+    title: "南保俊輔｜2028卒 エンジニア志望・ポートフォリオ",
+    description:
+      "顧客の課題を理解し、「何をつくるか」から提案できるエンジニアを目指しています。Hirolia で注文画面・メニュー管理画面・APIの実装、DB設計、本番運用を担当。",
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [OG_IMAGE.url],
+    title: "南保俊輔｜2028卒 エンジニア志望・ポートフォリオ",
+    description:
+      "顧客の課題を理解し、「何をつくるか」から提案できるエンジニアを目指しています。Hirolia で注文画面・メニュー管理画面・APIの実装、DB設計、本番運用を担当。",
+  },
+};
 
 export default function Home() {
-  return (
-    <>
-      {/* 1. 何者か */}
-      <Hero />
-
-      {/* 2. 一番強い証拠 */}
-      <FeaturedHirolia />
-
-      {/* 3. その他の経験 */}
-      <SelectedWork />
-
-      {/* 4. そこからどう考えるようになったか */}
-      <ThinkingSection />
-
-      {/* 5. 技術的な裏付け（主役にしない） */}
-      <TechnicalExperience />
-      <Milestones />
-      <SpikeGitHub />
-
-      {/* 6. 連絡先（既存フォームを流用） */}
-      <div className="border-t border-line">
-        <Contact />
-      </div>
-    </>
-  );
+  return <HomeV3 />;
 }

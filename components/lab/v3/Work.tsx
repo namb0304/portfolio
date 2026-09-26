@@ -252,7 +252,7 @@ export default function Work() {
               </ul>
 
               <Link
-                href={`${v3Featured.href}?from=lab`}
+                href={v3Featured.href}
                 className="group/cta mt-6 inline-flex items-center gap-2.5 rounded-[10px] bg-[var(--v3-fg)] px-6 py-3 text-[14px] font-semibold text-[var(--v3-bg)] transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--v3-accent)]"
               >
                 詳細を見る

@@ -18,7 +18,7 @@ import {
   ShotNote,
   ShotPlaceholder,
 } from "./Frames";
-import { JP_SANS, JP_SERIF } from "@/app/design-lab/fonts";
+import { JP_SANS, JP_SERIF } from "@/components/lab/design-lab/fonts";
 import {
   HIROLIA_SHOT,
   HIROLIA_SHOT_NOTE,
