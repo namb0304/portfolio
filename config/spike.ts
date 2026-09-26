@@ -135,9 +135,9 @@ export const hirolia = {
       "DB設計",
       "店舗別設定 / 一部のマルチテナント対応",
       "Render 本番環境の構築・運用",
-      "エラー監視 / 外形監視の設定",
-      "GitHub Actions による CI",
-      "DBバックアップ",
+      "Better Stack によるエラー監視・外形監視（Slack へ通知）",
+      "GitHub Actions による CI（pytest の自動実行）",
+      "PostgreSQL の外部バックアップ（pg_dump）",
       "本番障害対応",
     ],
     notMine: [
@@ -201,7 +201,7 @@ export const hirolia = {
       problem:
         "実店舗の営業時間中に落ちると、そのまま店舗の業務が止まる。最初は「落ちたことに気づくのが、店舗からの連絡」という状態だった。",
       action:
-        "Render 上のエラー監視と外形監視を入れて、落ちたことにこちらが先に気づける状態にした。GitHub Actions で CI を通してから反映する流れにし、DBのバックアップを取るようにした。障害が起きたときは、まず店舗が営業を続けられる状態に戻すことを優先した。",
+        "Better Stack でエラー監視と外形監視を入れ、異常を Slack へ通知して、落ちたことにこちらが先に気づける状態にした。GitHub Actions で pytest を通してから反映する流れにし、PostgreSQL は pg_dump で外部へバックアップを取るようにした。障害が起きたときは、まず店舗が営業を続けられる状態に戻すことを優先した。",
       result:
         "「動くものを作る」から「落ちたときに気づいて戻せるようにする」へ、自分の担当範囲が広がった。まだ手動に頼っている部分も残っていて、整備の途中。",
     },
@@ -236,8 +236,9 @@ export const hirolia = {
     "Python / Flask（Backend API）",
     "PostgreSQL（本番DB / DB設計）",
     "Render（本番環境）",
-    "GitHub Actions（CI）",
-    "エラー監視 / 外形監視 / DBバックアップ",
+    "GitHub Actions（CI / pytest の自動実行）",
+    "Better Stack（エラー監視 / 外形監視 → Slack 通知）",
+    "pg_dump（PostgreSQL の外部バックアップ）",
   ],
 } as const;
 
