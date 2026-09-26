@@ -15,6 +15,7 @@
  *
  * 負荷:
  *   animation は offset-distance / stroke-dashoffset / transform / opacity のみ。
+ *   走るのは 1 回だけで、終わったら静止する（無限反復はしない）。
  *   画面外では animation-play-state: paused で止める。依存は増やさない。
  */
 import { useEffect, useRef, useState } from "react";
@@ -126,6 +127,18 @@ export default function ArchTrail({ still }: { still: boolean }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [live, setLive] = useState(false);
 
+  /*
+    走るのは「1回の滞在につき1回」だけ。
+    読み終わったあとも勝手に走り続けると、文章から装飾へ視線が戻ってしまう。
+
+    run はこの滞在の識別子で、増やすと key が変わって SVG が作り直され、
+    CSS animation が頭から1回だけ再生される。
+    armed は「いま入ってきたら走ってよいか」。一度走ったら降ろし、
+    区画から出たときにまた立てる。滞在し続ける限り 2 周目は来ない。
+  */
+  const [run, setRun] = useState(0);
+  const armed = useRef(true);
+
   useEffect(() => {
     const el = ref.current;
     if (!el || still) return;
@@ -133,9 +146,20 @@ export default function ArchTrail({ still }: { still: boolean }) {
       setLive(true);
       return;
     }
-    const io = new IntersectionObserver(([e]) => setLive(e.isIntersecting), {
-      rootMargin: "15% 0px 15% 0px",
-    });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setLive(e.isIntersecting);
+        if (e.isIntersecting) {
+          if (armed.current) {
+            armed.current = false;
+            setRun((n) => n + 1);
+          }
+        } else {
+          armed.current = true;
+        }
+      },
+      { rootMargin: "15% 0px 15% 0px" }
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [still]);
@@ -215,20 +239,20 @@ export default function ArchTrail({ still }: { still: boolean }) {
           offset-path: path("${ARCH_PATH}");
           offset-rotate: 0deg;
           offset-distance: 0%;
-          animation: v3-arch-run ${ARCH_CYCLE}s linear infinite;
+          animation: v3-arch-run ${ARCH_CYCLE}s linear 1 both;
         }
-        .v3-arch-wake { animation: v3-arch-wake ${ARCH_CYCLE}s linear infinite; }
+        .v3-arch-wake { animation: v3-arch-wake ${ARCH_CYCLE}s linear 1 both; }
         .v3-arch-dust {
           transform-box: fill-box;
           transform-origin: center;
           opacity: 0;
-          animation: v3-arch-dust ${ARCH_CYCLE}s linear infinite;
+          animation: v3-arch-dust ${ARCH_CYCLE}s linear 1 both;
         }
         .v3-arch-dust-b { animation-name: v3-arch-dust-b; }
         .v3-arch-dust-c { animation-name: v3-arch-dust-c; }
         .v3-arch-amb {
           opacity: 0.05;
-          animation: v3-arch-amb ${(ARCH_CYCLE * 2.4).toFixed(1)}s ease-in-out infinite;
+          animation: v3-arch-amb ${(ARCH_CYCLE * 2.4).toFixed(1)}s ease-in-out 1 both;
         }
         .v3-arch-paused .v3-arch-head,
         .v3-arch-paused .v3-arch-wake,
@@ -241,6 +265,7 @@ export default function ArchTrail({ still }: { still: boolean }) {
       `}</style>
 
       <svg
+        key={run}
         viewBox="0 0 1180 420"
         fill="none"
         className={`h-full w-full ${running ? "" : "v3-arch-paused"}`}

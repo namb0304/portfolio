@@ -528,8 +528,14 @@ export function Activities() {
                       </span>
                       <span
                         className="text-[15px] leading-8 text-[var(--v3-fg)] [word-break:auto-phrase]"
-                        /* 通過前は沈ませ、通過後に読みやすい濃さへ戻す */
-                        style={{ opacity: `calc(0.5 + ${dot} * 0.5)` }}
+                        /*
+                          通過前は少し沈ませ、通過後に戻す。
+                          下限は 0.8。ここを 0.5 にすると、同じ opacity が中の
+                          受賞バッジ（11px / accent）にもかかって 2.67:1 まで落ちる。
+                          0.8 なら本文 10.1:1 / 受賞 4.9:1 で、どちらも AA を満たす。
+                          「線がまだ届いていない」ことは点と線の側で示す。
+                        */
+                        style={{ opacity: `calc(0.8 + ${dot} * 0.2)` }}
                       >
                         {it.text}
                         {"award" in it && it.award && (

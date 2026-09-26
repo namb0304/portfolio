@@ -191,8 +191,12 @@ export default function HomeV3() {
                   width={776}
                   height={776}
                   priority
-                  /* 実寸 96px 固定。これを伝えないと 776 / 1552px を取りに行く */
-                  sizes="96px"
+                  /*
+                    実寸は SP 96px / PC 320px。SP 版と PC 版の両方が DOM にあり
+                    どちらも priority なので、sizes が違うと preload が2本出る。
+                    同じ式にそろえると1本に畳まれ、幅ごとに正しい候補が選ばれる。
+                  */
+                  sizes="(min-width: 1024px) 320px, 96px"
                   className="h-full w-full object-cover object-top"
                 />
               </div>
@@ -227,10 +231,8 @@ export default function HomeV3() {
           </p>
 
           <p className="mt-5 flex items-start gap-2.5 border-l border-[var(--v3-rule)] pl-3.5 text-[13px] leading-7 text-[var(--v3-fg-2)] [word-break:auto-phrase]">
-            <span className="relative mt-2 flex h-[6px] w-[6px] shrink-0">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--v3-accent)] opacity-60 motion-safe:animate-ping" />
-              <span className="relative inline-flex h-[6px] w-[6px] rounded-full bg-[var(--v3-accent)]" />
-            </span>
+            {/* 稼働中の印。点だけで意味は足りるので、無限に広がる ping は置かない。 */}
+            <span className="mt-2 block h-[6px] w-[6px] shrink-0 rounded-full bg-[var(--v3-accent)]" />
             <span>{v3Profile.proof}</span>
           </p>
 
@@ -300,8 +302,8 @@ export default function HomeV3() {
                   width={776}
                   height={776}
                   priority
-                  /* グリッド左列は 320px 固定 */
-                  sizes="320px"
+                  /* SP 版と同じ式にそろえる（preload を1本にするため） */
+                  sizes="(min-width: 1024px) 320px, 96px"
                   className="h-full w-full object-cover object-top"
                 />
               </div>
@@ -382,10 +384,8 @@ export default function HomeV3() {
               className="mt-6 flex items-start gap-3 border-l border-[var(--v3-rule)] pl-4 text-[14px] leading-7 text-[var(--v3-fg-2)] transition-opacity duration-[600ms]"
               style={{ opacity: loaded ? 1 : 0, transitionDelay: "400ms" }}
             >
-              <span className="relative mt-2.5 flex h-[7px] w-[7px] shrink-0">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--v3-accent)] opacity-60 motion-safe:animate-ping" />
-                <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-[var(--v3-accent)]" />
-              </span>
+              {/* 稼働中の印。点だけで意味は足りるので、無限に広がる ping は置かない。 */}
+              <span className="mt-2.5 block h-[7px] w-[7px] shrink-0 rounded-full bg-[var(--v3-accent)]" />
               <span>{v3Profile.proof}</span>
             </p>
 
