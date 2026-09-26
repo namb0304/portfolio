@@ -27,7 +27,6 @@ export const siteConfig = {
     nameEn: "Nambo Shunsuke", 
     catchphrase: "初めて触れる人でも使いやすく、自然と使いたくなるサービスを創り続ける",
     bio: "初めて触れる人でも迷わず使え、自然とまた使いたくなる。\nそんな体験を目指して、Webアプリケーションの開発に取り組んでいます。\n \n開発では技術そのものだけでなく、「誰が・どんな状況で・どのように使うのか」を意識しながら考えることを大切にしています。\nUI/UXを中心に、フロントエンドを軸としつつ、バックエンドやデータベースにも触れながら学んできました。\n \n将来的には、ユーザーに近い立場からサービスの体験をより良くしていけるフロントエンジニアを目指しています。",
-    email: "shunsukenamb0304@gmail.com",
     github: "https://github.com/namb0304",
   },
   
@@ -104,7 +103,8 @@ export const siteConfig = {
         category: "university",
         tags: ["Python", "Flask", "SQLite"],
         image: "/projects/project-mobaoru.png",
-        url: "https://gms.gdl.jp/s_yugo2/general/explamation",
+        // 公開URLは現在 HTTP 500 のため掲載しない
+        url: "なし",
         github: "https://github.com/namb0304/ds_hakka.git"
     },
     {

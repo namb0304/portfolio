@@ -1,5 +1,54 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+   Visual Spike 2026-09 — 暫定デザイントークン
+   ※ 最終ブランドカラーではない。情報設計を評価するための仮パレット。
+   コントラスト実測（WCAG AA 基準 4.5:1）:
+     ink   / ground 16.18 : 1      ink   / panel 15.04 : 1
+     ink-2 / ground  8.55 : 1      ink-2 / panel  7.94 : 1
+     ink-3 / ground  5.61 : 1      ink-3 / panel  5.21 : 1
+     accent/ ground  8.88 : 1      ground / ink  16.18 : 1（反転CTA）
+   =========================================================================== */
+@theme {
+  --color-ground: #0c0e12; /* ページ地。純黒は使わない */
+  --color-panel: #14171d; /* 数少ない面。カードは原則使わない */
+  --color-line: #242932; /* 区切りはこの1本線に集約 */
+  --color-ink: #e9ebef; /* 純白は使わない */
+  --color-ink-2: #a6adb8; /* 本文の補助 */
+  --color-ink-3: #838b96; /* キャプション・ラベル */
+  --color-accent: #7fb5e6; /* 仮。用途は「現在も動いている印」のみに限定 */
+}
+
+/* 動きを減らす設定の尊重（監査 §7.4） */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* /design-lab (Direction B) のパネル切り替え。reduced-motion は上のブロックで無効化される。 */
+@keyframes labFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================================================================
+   以下は旧実装（Visual Spike では未レンダリング）が参照するスタイル。
+   今回は削除せず残す。
+   =========================================================================== */
 
 /* タイムラインの左右交互表示 (PC表示でのみ適用) */
 @media (min-width: 768px) {
@@ -10,13 +59,6 @@
     flex-direction: row-reverse;
   }
 }
-
-
-.group:hover a {
-  transform: rotateY(0deg) scale(1.05) translateZ(50px) !important;
-}
-
-
 
 /* === Embla Carousel 2D Coverflow Styles (最終修正版) === */
 .embla {
@@ -34,7 +76,7 @@
   flex: 0 0 80%;
   padding: 0 1rem;
   transition: transform 0.4s ease, opacity 0.4s ease;
-  
+
   /* デフォルト：すべてのカードを少し小さく、半透明に */
   transform: scale(0.85);
   opacity: 0.6;

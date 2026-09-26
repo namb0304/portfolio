@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<!--
+  共有画像（public/og.png）の組版。1200x630。
+  色・書体は Portfolio 本体のトークン（components/lab/v3/tokens.ts）と同じものだけを使う。
+  新しい装飾は足さない。Hero の「名前 → 英字 + 細い罫 → 肩書き」の並びをそのまま縮めた形。
+
+  更新するとき:
+    Playwright などで 1200x630 のビューポートで開き、public/og.png として保存する。
+-->
+<meta charset="utf-8" />
+<style>
+  :root {
+    --bg: #0E1620;
+    --navy: #16233A;
+    --rule: #243244;
+    --fg: #E8EDF3;
+    --fg-2: #93A1B4;
+    --accent: #5AA9D6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", YuGothic, "Noto Sans JP", sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 88px;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* 地の中央からわずかに navy を立ち上げる。面を増やさず奥行きだけ出す */
+  body::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 90% at 22% 42%, var(--navy) 0%, transparent 62%);
+  }
+  .inner { position: relative; }
+  .name {
+    font-size: 96px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+  }
+  .en {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 22px;
+  }
+  .en span {
+    font-size: 24px;
+    letter-spacing: 0.14em;
+    color: var(--fg-2);
+    white-space: nowrap;
+  }
+  .en i { display: block; height: 1px; width: 200px; background: var(--accent); }
+  .meta {
+    margin-top: 44px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 26px;
+    color: var(--fg);
+  }
+  .meta b { font-weight: 700; }
+  .meta em { font-style: normal; color: var(--rule); }
+  .lead {
+    margin-top: 30px;
+    font-size: 27px;
+    line-height: 1.7;
+    color: var(--fg-2);
+    max-width: 880px;
+    word-break: auto-phrase;
+  }
+  .foot {
+    position: absolute;
+    left: 88px; right: 88px; bottom: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 20px;
+    color: var(--fg-2);
+    letter-spacing: 0.06em;
+  }
+  .foot::before {
+    content: "";
+    position: absolute; left: 0; right: 0; top: -28px;
+    height: 1px; background: var(--rule);
+  }
+</style>
+<body>
+  <div class="inner">
+    <p class="name">南保 俊輔</p>
+    <p class="en"><span>Shunsuke Nambo</span><i></i></p>
+    <p class="meta"><b>2028卒</b><em>/</em><b>Portfolio</b></p>
+    <p class="lead">顧客の課題を理解し、「何をつくるか」から提案できるエンジニアを目指しています。</p>
+  </div>
+  <div class="foot">
+    <span>武蔵野大学 データサイエンス学部</span>
+    <span>Hirolia — 飲食店向けモバイルオーダー</span>
+  </div>
+</body>
+</html>
